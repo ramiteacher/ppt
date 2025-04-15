@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>네잎클로버 로또 추첨기</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0Y2FmNTAiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMTIgOGMtNC40MiAwLTgtMy41OC04LThoOGMwIDQgMy41OCA4IDggOHY4YzAgNC00IDgtOCA4VjE2YzAtNCAzLjU4LTggOC04aDgiLz48L3N2Zz4=" alt="클로버 아이콘" class="logo-icon">
+                <h1>네잎클로버 로또 추첨기</h1>
+            </div>
+        </header>
+        
+        <div class="mode-selector">
+            <label>
+                <input type="radio" name="mode" value="single" checked> 
+                <span>단일 조합</span>
+            </label>
+            <label>
+                <input type="radio" name="mode" value="multiple"> 
+                <span>5조합 생성</span>
+            </label>
+        </div>
+        
+        <div class="lotto-machine-container">
+            <div class="lotto-machine">
+                <div class="ball-container" id="ballContainer"></div>
+                <div class="machine-hole"></div>
+            </div>
+            
+            <div class="control-panel">
+                <button id="drawButton" class="btn primary">추첨</button>
+                <button id="skipButton" class="btn">결과 바로보기</button>
+                <button id="speedButton" class="btn">1X🚶</button>
+                <button id="soundButton" class="btn">🔊</button>
+            </div>
+            
+            <div class="result-panel" id="resultPanel">
+                <div class="result-section" id="resultNumbers"></div>
+                <button id="saveAllButton" class="btn save-all-btn" disabled>일괄 저장하기</button>
+            </div>
+        </div>
+        
+        <div class="button-group">
+            <button id="savedNumbersButton" class="floating-button">📋</button>
+            <button id="winCheckButton" class="floating-button">🏆</button>
+        </div>
+    </div>
+    
+    <!-- 저장된 번호 모달 -->
+    <div id="savedNumbersModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>저장된 번호</h3>
+                <span class="close-button" id="closeSavedNumbers">&times;</span>
+            </div>
+            <div class="modal-body" id="savedNumbersList">
+                <!-- 저장된 번호가 여기에 표시됩니다 -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- 당첨 확인 모달 -->
+    <div id="winCheckModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>당첨확인</h3>
+                <span class="close-button" id="closeWinCheck">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="latestDrawInfo">로딩 중...</div>
+                <div id="savedNumbersCheck"></div>
+            </div>
+        </div>
+    </div>
+    
+    <audio id="ballSound" preload="auto">
+        <source src="data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjIwLjEwMAAAAAAAAAAAAAAA//tUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAGAAAESAAzMzMzMzMzMzMzZmZmZmZmZmZmZpKSkpKSkpKSkpK/v7+/v7+/v7+/7Ozs7Ozs7Ozs7P////////////////////8AAAAATGF2YzU4LjM1AAAAAAAAAAAAAAAAJAUgAAAAAAAABEgux80tAAAAAAD/+9DEAAAIdTVZ0EEbwRbJqvsJI3gvGld6DT3AAAW3QtD0Pv8Q7XZTf//GNnfcYH/b/P4/+GMcQMP6IsX+axH//huev/n///UGUiGQyQoc4iEbQaUmYlJi9ITMjGVAkQkoGeeghOoKgRCiuhGe9qlzJVZIr5Yo+6SdUkkkkkSSSdD7qrTKF6pJJJPUkskkjQ+6qkyUkLEsTEyRAUplJJJJJJJJJGh91VJJFJJJJJJRpIrhJJJJIpJJJOh91VJJJJJJJJJIpJEw6SSSSSSSSSSdD7qrTJSSSSSSSSSRSkNMkkkkklEkkkkkkkkkkkkkkkk0yAiZKBMl1Tb1KSW9UTkRFiGoVJJXUdJpZJImLPchdeblrSwSXV1HXdSLqqCrE2ETFxZhEUYRFGERRhEhC6ShyiDQFWWLMsLIE7CIowP1F1YTFVDBxAsaF9MwQ3MoaTPhwyeKMvNBIXjBRKMDlwMIEsbgVHJFV6AgdeiOPOBELE5wwwBxOEwVGmCkmmZiRmYsLn66/5ghE0oUBjUSxuphWQ5GJOxmjcZsGmhACFA0wQBMCAw0giGIobhtQNOlfbdDs5YRiW3pMIwYCAUqcKgddgBgAgd6jUlGFl4DDHiyisz0WTQBCdVBKKb/+7DEcQDacRWBq1FuQ/wjsD8GKbAPvwAGiMCUC24DvwdKArBl+6oBS7rFAAGrjb4h7QSB4yMXaG20d7T6qyMzvdZbIRK5rbhzFOdrXXP7G4cuVRjlaqk9WTEFNRTMuOTkuNaqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq" type="audio/mpeg">
+    </audio>
+    
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,660 @@
+/* 기본 스타일 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --bg-color: #121212;
+    --text-color: #ffffff;
+    --primary-color: #4caf50;
+    --secondary-color: #303030;
+    --border-color: #404040;
+    --ball-yellow: #ffd54f;
+    --ball-blue: #42a5f5;
+    --ball-red: #ef5350;
+    --ball-gray: #bdbdbd;
+    --ball-green: #66bb6a;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+.container {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+/* 헤더 스타일 */
+header {
+    width: 100%;
+    text-align: center;
+    padding: 10px 0;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.logo-icon {
+    width: 32px;
+    height: 32px;
+}
+
+h1 {
+    font-size: 24px;
+    color: var(--primary-color);
+}
+
+/* 모드 선택 스타일 */
+.mode-selector {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 10px;
+}
+
+.mode-selector label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.mode-selector label:hover {
+    background-color: var(--secondary-color);
+}
+
+.mode-selector input[type="radio"] {
+    margin-right: 8px;
+}
+
+/* 로또 머신 스타일 */
+.lotto-machine-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.lotto-machine {
+    position: relative;
+    width: 320px;
+    height: 320px;
+    border-radius: 50%;
+    border: 4px solid var(--border-color);
+    background-color: rgba(255, 255, 255, 0.05);
+    overflow: hidden;
+}
+
+.ball-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.machine-hole {
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 20px;
+    background-color: var(--bg-color);
+    border-radius: 50% 50% 0 0;
+    z-index: 10;
+}
+
+/* 로또 공 스타일 */
+.ball {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 14px;
+    color: #000;
+    box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s, opacity 0.2s;
+    z-index: 1;
+    user-select: none;
+    cursor: default;
+}
+
+.ball:before {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: 8px;
+    width: 10px;
+    height: 5px;
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    transform: rotate(30deg);
+}
+
+/* 색상 분류 */
+.ball-1, .ball-2, .ball-3, .ball-4, .ball-5, .ball-6, .ball-7, .ball-8, .ball-9, .ball-10 {
+    background-color: var(--ball-yellow);
+}
+
+.ball-11, .ball-12, .ball-13, .ball-14, .ball-15, .ball-16, .ball-17, .ball-18, .ball-19, .ball-20 {
+    background-color: var(--ball-blue);
+}
+
+.ball-21, .ball-22, .ball-23, .ball-24, .ball-25, .ball-26, .ball-27, .ball-28, .ball-29, .ball-30 {
+    background-color: var(--ball-red);
+}
+
+.ball-31, .ball-32, .ball-33, .ball-34, .ball-35, .ball-36, .ball-37, .ball-38, .ball-39, .ball-40 {
+    background-color: var(--ball-gray);
+}
+
+.ball-41, .ball-42, .ball-43, .ball-44, .ball-45 {
+    background-color: var(--ball-green);
+}
+
+.selected-ball {
+    transform: scale(1.2);
+    z-index: 5;
+}
+
+.falling-ball {
+    animation: fallAnimation 1.5s forwards;
+}
+
+@keyframes fallAnimation {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: translateY(150px) scale(0.7);
+        opacity: 0.7;
+    }
+    100% {
+        transform: translateY(300px) scale(0.3);
+        opacity: 0;
+    }
+}
+
+/* 컨트롤 패널 스타일 */
+.control-panel {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.1s;
+    font-size: 14px;
+}
+
+.btn:hover {
+    background-color: #404040;
+}
+
+.btn:active {
+    transform: scale(0.95);
+}
+
+.btn.primary {
+    background-color: var(--primary-color);
+}
+
+.btn.primary:hover {
+    background-color: #3d8b40;
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* 결과 패널 스타일 - 새로 수정한 부분 */
+.result-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+}
+
+.result-section {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 15px;
+}
+
+.result-combo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.combo-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: var(--primary-color);
+}
+
+.result-balls-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.save-all-btn {
+    margin-top: 10px;
+    background-color: var(--primary-color);
+}
+
+.save-combo-btn {
+    padding: 5px 10px;
+    white-space: nowrap;
+    margin-left: 10px;
+}
+
+/* 결과 공 스타일 */
+.result-numbers {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.result-ball {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #000;
+    box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.3);
+    animation: popIn 0.5s;
+}
+
+@keyframes popIn {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    70% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* 플로팅 버튼 스타일 */
+.button-group {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.floating-button {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.2s, background-color 0.3s;
+}
+
+.floating-button:hover {
+    transform: scale(1.1);
+    background-color: #3d8b40;
+}
+
+/* 모달 스타일 */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 100;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    overflow-y: auto;
+}
+
+.modal-content {
+    background-color: var(--secondary-color);
+    margin: 10% auto;
+    padding: 20px;
+    width: 90%;
+    max-width: 500px;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    position: relative;
+    animation: slideIn 0.3s;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+}
+
+.close-button {
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close-button:hover {
+    color: var(--primary-color);
+}
+
+.saved-number-item {
+    margin: 10px 0;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    position: relative;
+}
+
+.saved-number-item .delete-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: none;
+    border: none;
+    color: var(--text-color);
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.saved-number-balls {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    flex-wrap: wrap;
+    margin-top: 5px;
+}
+
+.saved-number-ball {
+    width: 30px;
+    height: 30px;
+    font-size: 14px;
+}
+
+/* 당첨 확인 스타일 */
+#latestDrawInfo {
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+}
+
+.wincheck-item {
+    margin: 15px 0;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+}
+
+.match-count {
+    margin-top: 8px;
+    font-weight: bold;
+}
+
+.match-count.win {
+    color: var(--primary-color);
+}
+
+/* 일치하는 번호 강조 스타일 */
+.ball-matched {
+    animation: pulseGlow 1.5s infinite;
+    transform: scale(1.1);
+    box-shadow: 0 0 8px 2px var(--primary-color);
+}
+
+@keyframes pulseGlow {
+    0% {
+        box-shadow: 0 0 8px 2px var(--primary-color);
+    }
+    50% {
+        box-shadow: 0 0 12px 4px var(--primary-color);
+    }
+    100% {
+        box-shadow: 0 0 8px 2px var(--primary-color);
+    }
+}
+
+/* 당첨 등급 표시 스타일 */
+.rank-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    color: white;
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+.rank-1 {
+    background-color: gold;
+    color: black;
+}
+
+.rank-2 {
+    background-color: silver;
+    color: black;
+}
+
+.rank-3 {
+    background-color: #cd7f32; /* bronze */
+}
+
+.rank-4 {
+    background-color: #3d8b40;
+}
+
+.rank-5 {
+    background-color: #2196F3;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 480px) {
+    .lotto-machine {
+        width: 280px;
+        height: 280px;
+    }
+    
+    .ball {
+        width: 28px;
+        height: 28px;
+        font-size: 12px;
+    }
+    
+    .result-ball {
+        width: 35px;
+        height: 35px;
+        margin: 3px;
+    }
+    
+    .btn {
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+    
+    .floating-button {
+        width: 45px;
+        height: 45px;
+        font-size: 18px;
+    }
+    
+    .result-combo {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .save-combo-btn {
+        align-self: flex-end;
+        margin-left: 0;
+    }
+}
+
+/* 공 움직임 애니메이션 */
+@keyframes drift {
+    0% {
+        transform: translateX(0) translateY(0) rotate(0deg);
+    }
+    25% {
+        transform: translateX(var(--x1)) translateY(var(--y1)) rotate(90deg);
+    }
+    50% {
+        transform: translateX(var(--x2)) translateY(var(--y2)) rotate(180deg);
+    }
+    75% {
+        transform: translateX(var(--x3)) translateY(var(--y3)) rotate(270deg);
+    }
+    100% {
+        transform: translateX(var(--x1)) translateY(var(--y1)) rotate(360deg);
+    }
+}
+
+.drifting {
+    animation: drift 8s infinite ease-in-out;
+}
+
+.speed-4x .drifting {
+    animation-duration: 2s;
+}
+
+.speed-8x .drifting {
+    animation-duration: 1s;
+}
+
+/* 결과 공 번호별 색상 */
+.result-ball[data-number="1"], .result-ball[data-number="2"], .result-ball[data-number="3"], 
+.result-ball[data-number="4"], .result-ball[data-number="5"], .result-ball[data-number="6"], 
+.result-ball[data-number="7"], .result-ball[data-number="8"], .result-ball[data-number="9"], 
+.result-ball[data-number="10"] {
+    background-color: var(--ball-yellow);
+}
+
+.result-ball[data-number="11"], .result-ball[data-number="12"], .result-ball[data-number="13"], 
+.result-ball[data-number="14"], .result-ball[data-number="15"], .result-ball[data-number="16"], 
+.result-ball[data-number="17"], .result-ball[data-number="18"], .result-ball[data-number="19"], 
+.result-ball[data-number="20"] {
+    background-color: var(--ball-blue);
+}
+
+.result-ball[data-number="21"], .result-ball[data-number="22"], .result-ball[data-number="23"], 
+.result-ball[data-number="24"], .result-ball[data-number="25"], .result-ball[data-number="26"], 
+.result-ball[data-number="27"], .result-ball[data-number="28"], .result-ball[data-number="29"], 
+.result-ball[data-number="30"] {
+    background-color: var(--ball-red);
+}
+
+.result-ball[data-number="31"], .result-ball[data-number="32"], .result-ball[data-number="33"], 
+.result-ball[data-number="34"], .result-ball[data-number="35"], .result-ball[data-number="36"], 
+.result-ball[data-number="37"], .result-ball[data-number="38"], .result-ball[data-number="39"], 
+.result-ball[data-number="40"] {
+    background-color: var(--ball-gray);
+}
+
+.result-ball[data-number="41"], .result-ball[data-number="42"], .result-ball[data-number="43"], 
+.result-ball[data-number="44"], .result-ball[data-number="45"] {
+    background-color: var(--ball-green);
+}
+
+/* 저장된 번호 공 색상 */
+.saved-number-ball[data-number="1"], .saved-number-ball[data-number="2"], .saved-number-ball[data-number="3"], 
+.saved-number-ball[data-number="4"], .saved-number-ball[data-number="5"], .saved-number-ball[data-number="6"], 
+.saved-number-ball[data-number="7"], .saved-number-ball[data-number="8"], .saved-number-ball[data-number="9"], 
+.saved-number-ball[data-number="10"] {
+    background-color: var(--ball-yellow);
+}
+
+.saved-number-ball[data-number="11"], .saved-number-ball[data-number="12"], .saved-number-ball[data-number="13"], 
+.saved-number-ball[data-number="14"], .saved-number-ball[data-number="15"], .saved-number-ball[data-number="16"], 
+.saved-number-ball[data-number="17"], .saved-number-ball[data-number="18"], .saved-number-ball[data-number="19"], 
+.saved-number-ball[data-number="20"] {
+    background-color: var(--ball-blue);
+}
+
+.saved-number-ball[data-number="21"], .saved-number-ball[data-number="22"], .saved-number-ball[data-number="23"], 
+.saved-number-ball[data-number="24"], .saved-number-ball[data-number="25"], .saved-number-ball[data-number="26"], 
+.saved-number-ball[data-number="27"], .saved-number-ball[data-number="28"], .saved-number-ball[data-number="29"], 
+.saved-number-ball[data-number="30"] {
+    background-color: var(--ball-red);
+}
+
+.saved-number-ball[data-number="31"], .saved-number-ball[data-number="32"], .saved-number-ball[data-number="33"], 
+.saved-number-ball[data-number="34"], .saved-number-ball[data-number="35"], .saved-number-ball[data-number="36"], 
+.saved-number-ball[data-number="37"], .saved-number-ball[data-number="38"], .saved-number-ball[data-number="39"], 
+.saved-number-ball[data-number="40"] {
+    background-color: var(--ball-gray);
+}
+
+.saved-number-ball[data-number="41"], .saved-number-ball[data-number="42"], .saved-number-ball[data-number="43"], 
+.saved-number-ball[data-number="44"], .saved-number-ball[data-number="45"] {
+    background-color: var(--ball-green);
+}
