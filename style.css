@@ -1,0 +1,380 @@
+/* 전체 스타일 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* 프레젠테이션 컨테이너 */
+.presentation-container {
+    width: 100%;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+}
+
+/* 슬라이드 컨트롤 */
+.controls {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    z-index: 100;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 10px 20px;
+    border-radius: 30px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.control-btn {
+    background-color: #4361ee;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.control-btn:hover {
+    background-color: #3a56d4;
+    transform: scale(1.05);
+}
+
+#slide-number {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* 슬라이드 영역 */
+.slides-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.slide {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+}
+
+.slide.active {
+    opacity: 1;
+    z-index: 10;
+}
+
+.slide-content {
+    max-width: 1000px;
+    width: 100%;
+    background-color: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    position: relative;
+}
+
+/* 제목 스타일 */
+h1 {
+    font-size: 42px;
+    color: #4361ee;
+    text-align: center;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+h2 {
+    font-size: 36px;
+    color: #4361ee;
+    text-align: center;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+h3 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.subtitle {
+    font-size: 24px;
+    color: #5f6368;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* 텍스트 콘텐츠 스타일 */
+.toc-text, .key-points, .key-features, .tools-list, 
+.project-features, .prompt-principles, .vscode-tips, 
+.github-steps, .nfc-steps, .business-ideas, .faq-list, 
+.closing-message, .case-study, .solution, .quote, .conclusion {
+    width: 100%;
+    max-width: 800px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 10px;
+}
+
+.case-study, .quote {
+    background-color: #e9ecef;
+    border-left: 4px solid #4361ee;
+    font-style: italic;
+}
+
+.solution {
+    background-color: #e3f2fd;
+    border-left: 4px solid #2196f3;
+}
+
+ol, ul {
+    margin-left: 25px;
+}
+
+li {
+    margin-bottom: 10px;
+    font-size: 18px;
+}
+
+/* 발표자 정보 */
+.presenter-info {
+    position: absolute;
+    bottom: 20px;
+    right: 40px;
+    font-size: 20px;
+    font-weight: 600;
+    color: #5f6368;
+}
+
+/* 활용 가능성 그리드 */
+.possibilities-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    width: 100%;
+    max-width: 800px;
+}
+
+.possibility-item {
+    background-color: #e9ecef;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.possibility-item:hover {
+    background-color: #dee2e6;
+    transform: translateY(-5px);
+}
+
+/* FAQ 스타일 */
+.faq-item {
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.faq-item:last-child {
+    border-bottom: none;
+}
+
+.question {
+    font-weight: 600;
+    color: #4361ee;
+    font-size: 18px;
+}
+
+.answer {
+    font-size: 18px;
+}
+
+/* 프롬프트 버튼 */
+#show-prompt-btn {
+    background-color: #4361ee;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    margin-top: 20px;
+}
+
+#show-prompt-btn:hover {
+    background-color: #3a56d4;
+    transform: scale(1.05);
+}
+
+/* 모달 스타일 */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.modal-content {
+    background-color: white;
+    margin: 5% auto;
+    padding: 30px;
+    border-radius: 15px;
+    width: 80%;
+    max-width: 1000px;
+    max-height: 80vh;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+.close-modal {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.close-modal:hover {
+    color: #333;
+}
+
+.prompt-content {
+    margin-top: 20px;
+    overflow-y: auto;
+    max-height: 60vh;
+    padding-right: 10px;
+}
+
+#prompt-text {
+    white-space: pre-wrap;
+    font-family: 'Consolas', 'Monaco', monospace;
+    background-color: #f5f5f5;
+    padding: 20px;
+    border-radius: 10px;
+    border-left: 4px solid #4361ee;
+    overflow-x: auto;
+}
+
+/* 스크롤바 스타일 */
+.prompt-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.prompt-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.prompt-content::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+
+.prompt-content::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* 반응형 스타일 */
+@media (max-width: 1024px) {
+    .slide-content {
+        padding: 30px;
+    }
+    
+    h1 {
+        font-size: 36px;
+    }
+    
+    h2 {
+        font-size: 30px;
+    }
+    
+    .possibilities-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .slide-content {
+        padding: 20px;
+    }
+    
+    h1 {
+        font-size: 30px;
+    }
+    
+    h2 {
+        font-size: 26px;
+    }
+    
+    .controls {
+        padding: 8px 15px;
+    }
+    
+    .control-btn {
+        padding: 6px 12px;
+        font-size: 14px;
+    }
+    
+    .modal-content {
+        width: 90%;
+        padding: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .slide-content {
+        padding: 15px;
+    }
+    
+    h1 {
+        font-size: 24px;
+    }
+    
+    h2 {
+        font-size: 22px;
+    }
+    
+    .subtitle {
+        font-size: 18px;
+    }
+    
+    li {
+        font-size: 16px;
+    }
+}

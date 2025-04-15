@@ -1,0 +1,1531 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>코파일럿과 함께 즐기는 코딩 없는 웹사이트 만들기</title>
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #f72585;
+            --accent-color: #ff9500;
+            --background-color: #f9f7f7;
+            --text-color: #333;
+            --box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            --gradient-bg: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+            line-height: 1.5;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            overflow-x: hidden;
+            overflow-y: hidden;
+            background-image: linear-gradient(to right bottom, rgba(255,255,255,0.8), rgba(240,240,250,0.8)), 
+                              url('images/background_pattern.png');
+            background-size: cover;
+        }
+
+        /* 슬라이드 컨테이너 스타일 수정 */
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            padding: 3vh 5vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+        }
+
+        .slide.active {
+            opacity: 1;
+            z-index: 5;
+            pointer-events: all;
+        }
+
+        .slide-content {
+            width: 100%;
+            max-width: 1400px;
+            max-height: 94vh;
+            padding: 2vh 3vw;
+            border-radius: 16px;
+            background-color: rgba(255, 255, 255, 0.8);
+            box-shadow: var(--box-shadow);
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-color) transparent;
+        }
+
+        .slide-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .slide-content::-webkit-scrollbar-thumb {
+            background-color: var(--primary-color);
+            border-radius: 4px;
+        }
+
+        .slide-content::-webkit-scrollbar-track {
+            background-color: transparent;
+        }
+        
+        /* 슬라이드 컨테이너 */
+        .slides-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* 네비게이션 버튼 */
+        .nav-buttons {
+            position: fixed;
+            bottom: 3vh;
+            right: 3vw;
+            display: flex;
+            gap: 1vw;
+            z-index: 100;
+        }
+
+        .nav-button {
+            width: 4vw;
+            height: 4vw;
+            min-width: 40px;
+            min-height: 40px;
+            max-width: 60px;
+            max-height: 60px;
+            background: var(--gradient-bg);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 1.5vw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .nav-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 슬라이드 인디케이터 */
+        .slide-indicator {
+            position: fixed;
+            bottom: 3vh;
+            left: 3vw;
+            transform: translateX(0);
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 0.8vh 1.5vw;
+            border-radius: 30px;
+            font-size: 1.2vw;
+            z-index: 100;
+            box-shadow: var(--box-shadow);
+        }
+
+        /* 헤딩 스타일 조정 */
+        h1 {
+            font-size: 3vw;
+            margin-bottom: 2vh;
+            color: var(--primary-color);
+            text-align: center;
+        }
+        
+        h2 {
+            font-size: 2.5vw;
+            margin-bottom: 2vh;
+            color: var(--primary-color);
+            text-align: center;
+        }
+        
+        h3 {
+            font-size: 1.8vw;
+            margin-bottom: 1.5vh;
+            color: var(--text-color);
+        }
+        
+        h4 {
+            font-size: 1.4vw;
+            margin-bottom: 1vh;
+        }
+        
+        p {
+            font-size: 1.2vw;
+            margin-bottom: 1vh;
+            line-height: 1.6;
+        }
+
+        /* 반응형 이미지 조정 */
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+        
+        /* 리스트 스타일 */
+        ul {
+            list-style: none;
+            margin-left: 1vw;
+        }
+        
+        .icon-list li {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1vh;
+            font-size: 1.2vw;
+        }
+        
+        .icon-list li i {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 2vw;
+            height: 2vw;
+            margin-right: 0.8vw;
+            color: var(--primary-color);
+            flex-shrink: 0;
+        }
+        
+        /* 그리드 및 컬럼 레이아웃 */
+        .two-columns, .three-columns, .four-columns {
+            display: grid;
+            gap: 2vw;
+            margin: 2vh 0;
+        }
+        
+        .two-columns {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .three-columns {
+            grid-template-columns: repeat(3, 1fr);
+        }
+        
+        .four-columns {
+            grid-template-columns: repeat(4, 1fr);
+        }
+        
+        /* 카드 스타일 */
+        .card {
+            background: white;
+            padding: 1.5vw;
+            border-radius: 10px;
+            box-shadow: var(--box-shadow);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* 미디어 쿼리 - 화면 크기에 따른 반응형 조정 */
+        @media (max-width: 1200px) {
+            h1 { font-size: 3.5vw; }
+            h2 { font-size: 3vw; }
+            h3 { font-size: 2.2vw; }
+            p, .icon-list li { font-size: 1.4vw; }
+            
+            .four-columns {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            h1 { font-size: 5vw; }
+            h2 { font-size: 4.5vw; }
+            h3 { font-size: 3.5vw; }
+            h4 { font-size: 3vw; }
+            p, .icon-list li { font-size: 2.5vw; }
+            
+            .two-columns, .three-columns, .four-columns {
+                grid-template-columns: 1fr;
+                gap: 3vw;
+            }
+            
+            .slide {
+                padding: 2vh 3vw;
+            }
+            
+            .slide-content {
+                padding: 1.5vh 2.5vw;
+            }
+        }
+
+        /* 기타 유틸리티 클래스 */
+        .text-center {
+            text-align: center;
+        }
+        
+        .mb-1 {
+            margin-bottom: 1vh;
+        }
+        
+        .mb-2 {
+            margin-bottom: 2vh;
+        }
+        
+        .mb-3 {
+            margin-bottom: 3vh;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="slides-container">
+        <!-- 슬라이드 1: 표지 -->
+        <section class="slide active" id="slide-1">
+            <div class="slide-content" style="text-align: center; background: linear-gradient(135deg, rgb(255, 255, 255), rgba(255, 255, 255, 0.5));">
+                <div style="position: relative; padding: 3vh 0;">
+                    <h1 style="font-size: 3.5vw; color: var(--primary-color); margin-bottom: 2vh;">AI로 나만의 웹사이트 만들기</h1>
+                    <div style="font-size: 1.8vw; margin-bottom: 3vh; color: var(--secondary-color);">비전공자도 누구나 가능!</div>
+                    
+                    <div style="display: flex; justify-content: center; margin: 4vh 0;">
+                        <img src="images/copilot_interface.png" alt="VS Code 코파일럿 에이전트 인터페이스" style="max-width: 35%; border-radius: 15px; box-shadow: var(--box-shadow);">
+                    </div>
+                    
+                    <div style="margin: 3vh 0; display: flex; justify-content: center; gap: 2vw;">
+                        <div style="background: white; padding: 1.5vw 3vw; border-radius: 8px; box-shadow: var(--box-shadow); display: flex; align-items: center;">
+                            <div style="font-size: 3vw; margin-right: 1.5vw;">👨‍💻</div>
+                            <div style="font-size: 1.5vw; text-align: left;">코딩 지식 없이<br>웹사이트 제작</div>
+                        </div>
+                        <div style="background: white; padding: 1.5vw 3vw; border-radius: 8px; box-shadow: var(--box-shadow); display: flex; align-items: center;">
+                            <div style="font-size: 3vw; margin-right: 1.5vw;">🚀</div>
+                            <div style="font-size: 1.5vw; text-align: left;">AI 프롬프트<br>작성 기술</div>
+                        </div>
+                        <div style="background: white; padding: 1.5vw 3vw; border-radius: 8px; box-shadow: var(--box-shadow); display: flex; align-items: center;">
+                            <div style="font-size: 3vw; margin-right: 1.5vw;">📱</div>
+                            <div style="font-size: 1.5vw; text-align: left;">배포 및<br>상품화</div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 3vh; font-size: 1vw; color: #666;">
+                        <p></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 슬라이드 2: 수업 순서도 -->
+        <section class="slide" id="slide-2">
+            <div class="slide-content">
+            <h2>📍 로드맵</h2>
+            <h3 style="text-align: center; color: var(--primary-color); margin-bottom: 1rem;">
+                <span style="background: var(--accent-color); color: white; padding: 0.3rem 0.8rem; border-radius: 30px; display: inline-block;">
+                <strong>🎯 목표</strong>
+                </span>
+            </h3>
+            <div style="background: linear-gradient(135deg, rgba(106, 90, 205, 0.1), rgba(255, 107, 107, 0.1)); padding: 1.5rem; border-radius: 15px; margin: 1.5rem 0; box-shadow: var(--box-shadow);">
+                <p style="text-align: center; font-size: 1.3rem; margin-bottom: 0rem;">
+                
+                <strong>코딩 지식 없이도 AI의 도움으로</strong><br>
+                <strong>웹사이트 제작 및 배포하기</strong>
+                </p>
+            </div>
+            
+            <div style="display: flex; justify-content: center; margin: 2rem 0;">
+                <div style="position: relative; width: 90%; max-width: 800px;">
+                <!-- 순서도 스타일 컨테이너 -->
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 30px;">
+                    <!-- 단계 1 -->
+                    <div style="width: 100%; background: var(--gradient-bg); color: white; padding: 15px; border-radius: 15px; text-align: center; position: relative; box-shadow: var(--box-shadow); transform: translateZ(0);">
+                    <h3 style="margin: 0; display: flex; align-items: center; justify-content: center; font-size: 1rem;"></h3>
+                        <span style="background: white; color: var(--primary-color); width: 35px; height: 35px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-right: 10px; font-weight: bold;">1</span> 
+                        <span style="color: #f9f7f7;">당장 시작해야 하는 이유</span>
+                    </h3>
+                    <div style="position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; border-top: 12px solid var(--secondary-color); z-index: 2;"></div>
+                    </div>
+                    
+                    <!-- 단계 2 -->
+                    <div style="width: 100%; background: var(--gradient-bg); color: white; padding: 15px; border-radius: 15px; text-align: center; position: relative; box-shadow: var(--box-shadow); transform: translateZ(0);">
+                    <h3 style="margin: 0; display: flex; align-items: center; justify-content: center; font-size: 1rem;">
+                        <span style="background: white; color: var(--primary-color); width: 35px; height: 35px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-right: 10px; font-weight: bold;">2</span> 
+                        <span style="color: #f9f7f7;">필요한 툴들은?</span>
+                    </h3>
+                    <div style="position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; border-top: 12px solid var(--secondary-color); z-index: 2;"></div>
+                    </div>
+                    
+                    <!-- 단계 3 -->
+                    <div style="width: 100%; background: var(--gradient-bg); color: white; padding: 15px; border-radius: 15px; text-align: center; position: relative; box-shadow: var(--box-shadow); transform: translateZ(0);">
+                    <h3 style="margin: 0; display: flex; align-items: center; justify-content: center; font-size: 1rem;">
+                        <span style="background: white; color: var(--primary-color); width: 35px; height: 35px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-right: 10px; font-weight: bold;">3</span> 
+                        <span style="color: #f9f7f7;">예시 프로젝트 만들어보기</span>
+                    </h3>
+                    <div style="position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; border-top: 12px solid var(--secondary-color); z-index: 2;"></div>
+                    </div>
+                    
+                    <!-- 단계 4 -->
+                    <div style="width: 100%; background: var(--gradient-bg); color: white; padding: 15px; border-radius: 15px; text-align: center; position: relative; box-shadow: var(--box-shadow); transform: translateZ(0);">
+                    <h3 style="margin: 0; display: flex; align-items: center; justify-content: center; font-size: 1rem;">
+                        <span style="background: white; color: var(--primary-color); width: 35px; height: 35px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-right: 10px; font-weight: bold;">4</span> 
+                        <span style="color: #f9f7f7;">내 페이지 무료로 배포하기</span>
+                    </h3>
+                    <div style="position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; border-top: 12px solid var(--secondary-color); z-index: 2;"></div>
+                    </div>
+                    
+                    <!-- 단계 5 -->
+                    <div style="width: 100%; background: var(--gradient-bg); color: white; padding: 15px; border-radius: 15px; text-align: center; position: relative; box-shadow: var(--box-shadow); transform: translateZ(0);">
+                    <h3 style="margin: 0; display: flex; align-items: center; justify-content: center; font-size: 1rem;">
+                        <span style="background: white; color: var(--primary-color); width: 35px; height: 35px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-right: 10px; font-weight: bold;">5</span> 
+                        <span style="color: #f9f7f7;">추가 팁</span>
+                    </h3>
+                    </div>
+                </div>
+                </div>
+            </div>
+            </div>
+        </section>
+
+        <!-- 슬라이드 3: 온라인 셀러들의 고민 -->
+        <section class="slide" id="slide-3">
+            <div class="slide-content">
+                <h2>💭 온라인 셀러들의 고민</h2>
+                
+                <div style="display: flex; justify-content: center; margin-bottom: 2rem;">
+                    <img src="images/online_seller.png" alt="온라인 셀러 고민" class="centered-image" style="max-height: 250px; border-radius: 10px;">
+                </div>
+                
+                
+                <div style="background: linear-gradient(135deg, #fff0f0, #ffe6e6); padding: 1.5rem; border-radius: 15px; margin-bottom: 2rem; box-shadow: var(--box-shadow); border-left: 5px solid var(--accent-color);">
+                    <div style="display: flex; align-items: center; margin-bottom: 0.8rem;">
+                        <div style="font-size: 1.8rem; margin-right: 1rem;">😓</div>
+                        <p style="font-size: 1.3rem; margin: 0; font-style: italic;">"아 몰라 그냥 도매해와서 팔자."</p>
+                    </div>
+                    <div style="display: flex; align-items: center;">
+                        <div style="font-size: 1.8rem; margin-right: 1rem;">🤷‍♀️</div>
+                        <p style="font-size: 1.3rem; margin: 0; font-style: italic;">"하던 방식대로 하자."</p>
+                    </div>
+                </div>
+                
+            </div>
+        </section>
+
+        <!-- 슬라이드 4: 실제 사례 -->
+        <section class="slide" id="slide-4">
+            <div class="slide-content">
+            <h2 style="font-size: 2.5vw;">📱 실제 사례 - 야구 유니폼 NFC 키링</h2>
+            
+            <div style="display: flex; gap: 2vw; margin-bottom: 2vh;">
+                <div style="flex: 1;">
+                <a href="https://ramiteacher.github.io/baseball/" target="_blank" style="display: block; text-decoration: none;">
+                    <img src="images/baseball_keyring.png" alt="야구 유니폼 NFC 키링" style="width: 100%; border-radius: 10px; box-shadow: var(--box-shadow); transition: transform 0.3s, box-shadow 0.3s;">
+                </a>
+                <style>
+                    a:hover img {
+                    transform: scale(1.05);
+                    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+                    }
+                </style>
+                </div>
+                <div style="flex: 1; background: #f8f9ff; padding: 2vh 2vw; border-radius: 15px; box-shadow: var(--box-shadow); border-left: 5px solid var(--primary-color);">
+                        <h3 style="margin: 0 0 10px 0; background: rgba(106, 90, 205, 0.1); padding: 0.5vh 1vw; border-radius: 30px; display: inline-block; font-size: 1.5vw;">아이디어</h3>
+                        <p style="font-size: 1.1vw;">
+                            "야구 유니폼 모양의 NFC 키링을 만들건데요, 스마트폰으로 키링을 태그하면 우리 팀 경기 하이라이트나 최근 경기 결과, 실시간 순위를 보여주는 웹사이트를 연결하고 싶어요."
+                        </p>
+                        
+                        <h3 style="margin: 0 0 10px 0; background: rgba(106, 90, 205, 0.1); padding: 0.5vh 1vw; border-radius: 30px; display: inline-block; font-size: 1.5vw;">주요 기능</h3>
+                        <div style="display: flex; flex-direction: column; gap: 0.5vh;">
+                            <span style="color: var(--primary-color); margin-bottom: 0.5vh;">🎬 하이라이트 영상 연결</span>
+                            <span style="color: var(--primary-color); margin-bottom: 0.5vh;">🏆 실시간 팀 순위 출력</span>
+                            <span style="color: var(--primary-color); margin-bottom: 0.5vh;">⚾ 야구 경기 결과 자동 업데이트</span>
+                            <span style="color: var(--primary-color);">📱 모바일 최적화 디자인</span>
+                        </div>
+                    
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 1.5vh;">
+                    <div style="display: flex; align-items: center; margin-bottom: 0.8vh;">
+                        
+                    </div>
+                    
+                
+                <div style="background: linear-gradient(135deg, #e3f2fd, #bbdefb); padding: 1vh 1.5vw; border-radius: 15px; text-align: center; box-shadow: var(--box-shadow);">
+                
+                    <div style="display: flex; justify-content: center; gap: 1vw;">
+                        <div style="background: white; padding: 0.8vh 0.8vw; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                            <div style="font-size: 1.8vw; margin-bottom: 0.3vh;">📄</div>
+                            <p style="margin: 0; font-size: 1.2vw;">HTML</p>
+                        </div>
+                        <div style="background: white; padding: 0.8vh 0.8vw; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                            <div style="font-size: 1.8vw; margin-bottom: 0.3vh;">📊</div>
+                            <p style="margin: 0; font-size: 1.2vw;">JSON 데이터</p>
+                        </div>
+                        <div style="background: white; padding: 0.8vh 0.8vw; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                            <div style="font-size: 1.8vw; margin-bottom: 0.3vh;">🚀</div>
+                            <p style="margin: 0; font-size: 1.2vw;">GitHub Pages</p>
+                        </div>
+                        <div style="background: white; padding: 0.8vh 0.8vw; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                            <div style="font-size: 1.8vw; margin-bottom: 0.3vh;">📲</div>
+                            <p style="margin: 0; font-size: 1.2vw;">NFC 키링</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 슬라이드 5: 활용 가능성 -->
+        <section class="slide" id="slide-5">
+            <div class="slide-content">
+                <h2>💡 활용 가능성</h2>
+                
+                <div style="text-align: center; margin-bottom: 1.5vh;">
+                    <div style="display: inline-block; background: linear-gradient(135deg, rgba(106, 90, 205, 0.1), rgba(255, 107, 107, 0.1)); padding: 1vh 2vw; border-radius: 50px; box-shadow: var(--box-shadow);">
+                        <p style="font-size: 1.4vw; margin: 0;"><strong>🎯 AI로 만드는 맞춤형 웹 콘텐츠</strong></p>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5vw; margin: 2vh 0;">
+                    
+                    <div style="background: var(--gradient-bg); color: white; padding: 2vh 2vw; border-radius: 15px; text-align: center; box-shadow: var(--box-shadow); transition: transform 0.3s, box-shadow 0.3s; position: relative; overflow: hidden; cursor: pointer;" onclick="window.open('https://vermillion-crostata-64863b.netlify.app/', '_blank')">
+                        <div style="position: absolute; top: -15px; right: -15px; background: rgba(255,255,255,0.2); width: 80px; height: 80px; border-radius: 50%; transform: scale(1.5);"></div>
+                        <div style="font-size: 3vw; margin-bottom: 1vh;">🎲</div>
+                        <h3 style="position: relative; z-index: 1; font-size: 1.8vw; color: #ffffff;">로또 번호 추첨 사이트</h3>
+                    </div>
+                    <div style="background: var(--secondary-color); color: white; padding: 2vh 2vw; border-radius: 15px; text-align: center; box-shadow: var(--box-shadow); transition: transform 0.3s; position: relative; overflow: hidden; cursor: pointer;" onclick="window.open('https://ramiteacher.github.io/conch/', '_blank')">
+                        <div style="position: absolute; top: -15px; right: -15px; background: rgba(255,255,255,0.2); width: 80px; height: 80px; border-radius: 50%; transform: scale(1.5);"></div>
+                        <div style="font-size: 3vw; margin-bottom: 1vh;">🐚</div>
+                        <h3 style="position: relative; z-index: 1; font-size: 1.8vw; color: #ffffff;">마법의 소라고둥</h3>
+                    </div>
+                    <div style="background: var(--accent-color); color: white; padding: 2vh 2vw; border-radius: 15px; text-align: center; box-shadow: var(--box-shadow); transition: transform 0.3s; position: relative; overflow: hidden; cursor: pointer;" onclick="window.open('https://ramiteacher.github.io/dinner/', '_blank')">
+                        <div style="position: absolute; top: -15px; right: -15px; background: rgba(255,255,255,0.2); width: 80px; height: 80px; border-radius: 50%; transform: scale(1.5);"></div>
+                        <div style="font-size: 3vw; margin-bottom: 1vh;">🍔</div>
+                        <h3 style="position: relative; z-index: 1; font-size: 1.8vw; color: #ffffff;">음식 메뉴 룰렛</h3>
+                    </div>
+                    <div style="background: #95e485; color: white; padding: 2vh 2vw; border-radius: 15px; text-align: center; box-shadow: var(--box-shadow); transition: transform 0.3s; position: relative; overflow: hidden; cursor: pointer;" onclick="window.open('https://ramiteacher.github.io/', '_blank')">
+                        <div style="position: absolute; top: -15px; right: -15px; background: rgba(255,255,255,0.2); width: 80px; height: 80px; border-radius: 50%; transform: scale(1.5);"></div>
+                        <div style="font-size: 3vw; margin-bottom: 1vh;">👤</div>
+                        <h3 style="position: relative; z-index: 1; font-size: 1.8vw; color: #ffffff;">개인용 페이지</h3>
+                    </div>
+                </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 2vh; background: white; padding: 2vh 2vw; border-radius: 15px; box-shadow: var(--box-shadow);">
+                    <div style="display: flex; align-items: center; margin-bottom: 1vh;">
+                        <div style="font-size: 2.2vw; margin-right: 1vw; color: var(--primary-color);">🔍</div>
+                        <h3 style="margin: 0; font-size: 1.8vw;">사용자가 원하는 모든 웹사이트 제작 가능</h3>
+                    </div>
+                    <p style="font-size: 1.2vw; margin-left: 3.2vw;">
+                        개인 포트폴리오, 제품 랜딩 페이지, 고객 정보 페이지, 비즈니스 명함, 미니 게임 등<br>
+                        텍스트 프롬프트만으로 원하는 웹사이트를 빠르게 만들 수 있습니다.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        
+<!-- 슬라이드 6: 준비물 -->
+        <section class="slide" id="slide-6">
+            <div class="slide-content">
+                <h2>🧰 준비물</h2>
+                
+                <div style="text-align: center; margin-bottom: 1.5vh;">
+                    <div style="display: inline-block; background: linear-gradient(135deg, rgba(106, 90, 205, 0.1), rgba(255, 107, 107, 0.1)); padding: 0.8vh 1.5vw; border-radius: 50px; box-shadow: var(--box-shadow);">
+                        <p style="font-size: 1.3vw; margin: 0;"><strong>쉽게 시작할 수 있는 AI 웹사이트 제작</strong></p>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2vw; margin-bottom: 1.5vh;">
+                    <div style="background: white; border-radius: 15px; box-shadow: var(--box-shadow); padding: 1.5vh 1vw; text-align: center;">
+                        <div style="font-size: 3vw; margin-bottom: 0.5vh;">💻</div>
+                        <h4 style="margin: 0 0 0.5vh 0; font-size: 1.2vw; color: var(--primary-color);">컴퓨터</h4>
+                        <p style="margin: 0; font-size: 0.9vw;">Windows, Mac, Linux</p>
+                    </div>
+                    <div style="background: white; border-radius: 15px; box-shadow: var(--box-shadow); padding: 1.5vh 1vw; text-align: center;">
+                        <div style="font-size: 3vw; margin-bottom: 0.5vh;">📝</div>
+                        <h4 style="margin: 0 0 0.5vh 0; font-size: 1.2vw; color: var(--primary-color);">VS Code</h4>
+                        <p style="margin: 0; font-size: 0.9vw;">무료 다운로드</p>
+                    </div>
+                    <div style="background: white; border-radius: 15px; box-shadow: var(--box-shadow); padding: 1.5vh 1vw; text-align: center;">
+                        <div style="font-size: 3vw; margin-bottom: 0.5vh;">🐙</div>
+                        <h4 style="margin: 0 0 0.5vh 0; font-size: 1.2vw; color: var(--primary-color);">GitHub 계정</h4>
+                        <p style="margin: 0; font-size: 0.9vw;">무료 가입</p>
+                    </div>
+                    <div style="background: white; border-radius: 15px; box-shadow: var(--box-shadow); padding: 1.5vh 1vw; text-align: center;">
+                        <div style="font-size: 3vw; margin-bottom: 0.5vh;">🤖</div>
+                        <h4 style="margin: 0 0 0.5vh 0; font-size: 1.2vw; color: var(--primary-color);">GitHub Copilot</h4>
+                        <p style="margin: 0; font-size: 0.9vw;">무료 이용 (한도 초과 시 월 $10)</p>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 1.5vw;">
+                    <div style="flex: 1; background: linear-gradient(135deg, #e8f5e9, #c8e6c9); padding: 1vh 1.5vw; border-radius: 15px; box-shadow: var(--box-shadow); text-align: center;">
+                        <div style="font-size: 2vw; margin-bottom: 0.3vh;">💡</div>
+                        <p style="margin: 0; font-size: 1vw;"><strong>학생 및 교육자는</strong> <a href="https://education.github.com/" target="_blank" style="color: var(--primary-color); text-decoration: none; font-weight: bold;">GitHub Education</a>을 통해 <strong>무료로 사용 가능</strong></p>
+                    </div>
+                    <div style="flex: 1; background: linear-gradient(135deg, #e3f2fd, #bbdefb); padding: 1vh 1.5vw; border-radius: 15px; box-shadow: var(--box-shadow); text-align: center;">
+                        <div style="font-size: 2vw; margin-bottom: 0.3vh;">📱</div>
+                        <p style="margin: 0; font-size: 1vw;"><strong>NFC 키링 제작 시:</strong> NFC 태그가 내장된 키링 + NFC 태그 쓰기 앱(스마트폰)</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- 슬라이드 7: VS Code와 코파일럿 에이전트 소개 -->
+        <section class="slide" id="slide-7">
+            <div class="slide-content">
+                <h2>🚀 VS Code와 코파일럿 에이전트</h2>
+                
+                <div class="two-columns" style="gap: 2.5rem;">
+                    <div class="column" style="background: linear-gradient(135deg, #f5f7ff, #f0f0f5); padding: 1.5rem; border-radius: 15px; box-shadow: var(--box-shadow);">
+                        <h3 style="display: flex; align-items: center;"><span style="background: var(--primary-color); color: white; width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-right: 10px; font-size: 1.5rem;">💻</span> Visual Studio Code</h3>
+                        <ul class="icon-list">
+                            <li><i>🆓</i> 무료 코드 에디터</li>
+                            <li><i>🔌</i> 확장 프로그램으로 기능 확장</li>
+                            <li><i>💻</i> 모든 운영체제 지원</li>
+                            <li><i>🚀</i> 가볍고 빠른 실행 속도</li>
+                        </ul>
+                    </div>
+                    <div class="column" style="background: linear-gradient(135deg, rgba(106, 90, 205, 0.1), rgba(106, 90, 205, 0.2)); padding: 1.5rem; border-radius: 15px; box-shadow: var(--box-shadow);">
+                        <h3 style="display: flex; align-items: center;"><span style="background: var(--primary-color); color: white; width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-right: 10px; font-size: 1.5rem;">🤖</span> 코파일럿 에이전트</h3>
+                        <ul class="icon-list">
+                            <li><i>🧠</i> Claude 3.7 기반 AI 비서</li>
+                            <li><i>💬</i> 자연어로 코드 생성 요청</li>
+                            <li><i>🔄</i> 복잡한 웹사이트 자동 제작</li>
+                            <li><i>✨</i> 코딩 지식 없이도 사용 가능</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 1.5rem;">
+                    <div style="display: inline-block; background: var(--accent-color); color: white; padding: 0.8rem 1.5rem; border-radius: 30px; box-shadow: var(--box-shadow);">
+                        <p style="margin: 0; font-size: 1.2rem;"><i>🔥</i> <strong>AI가 모든 코드를 자동으로 생성!</strong> <i>🔥</i></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- 슬라이드 8: VS Code 설치 및 설정 -->
+        <section class="slide" id="slide-8">
+            <div class="slide-content">
+                <h2>⚙️ VS Code 설치 및 설정</h2>
+                
+                <div style="text-align: center; margin-bottom: 1.5rem;">
+                    <div style="display: inline-block; background: linear-gradient(135deg, rgba(106, 90, 205, 0.1), rgba(255, 107, 107, 0.1)); padding: 1rem 2rem; border-radius: 50px; box-shadow: var(--box-shadow);">
+                        <p style="font-size: 1.4rem; margin: 0;"><strong>쉽고 간편한 개발 환경 구축</strong></p>
+                    </div>
+                </div>
+                
+                <div style="position: relative; text-align: center; margin-bottom: 2rem;">
+                    <img src="images/vscode_screen.png" alt="VS Code 화면" style="max-height: 250px; border-radius: 15px; border: 3px solid var(--primary-color); box-shadow: var(--box-shadow);">
+                    <div style="position: absolute; top: -15px; left: -15px; background: #4caf50; color: white; border-radius: 50%; width: 60px; height: 60px; display: flex; justify-content: center; align-items: center; font-size: 1.8rem; transform: rotate(-15deg); box-shadow: 0 3px 10px rgba(0,0,0,0.2);">🔧</div>
+                </div>
+                
+                <div class="two-columns" style="gap: 2.5rem;">
+                    <div class="column" style="background: linear-gradient(135deg, #f5f7ff, #f0f0f5); padding: 1.5rem; border-radius: 15px; box-shadow: var(--box-shadow);">
+                        <h3 style="display: flex; align-items: center; margin-bottom: 1.2rem;">
+                            <span style="background: var(--primary-color); color: white; width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-right: 10px; font-size: 1.5rem;">📥</span>
+                            VS Code 설치
+                        </h3>
+                        <ol class="steps">
+                            <li><a href="https://code.visualstudio.com/" target="_blank" style="color: var(--primary-color); text-decoration: none; font-weight: bold;">code.visualstudio.com</a> 방문</li>
+                            <li>운영체제에 맞는 설치 파일 다운로드</li>
+                            <li>설치 파일 실행 및 안내에 따라 설치</li>
+                            <li>첫 실행 후 언어 설정 (한국어 가능)</li>
+                        </ol>
+                    </div>
+                    <div class="column" style="background: linear-gradient(135deg, rgba(106, 90, 205, 0.1), rgba(106, 90, 205, 0.2)); padding: 1.5rem; border-radius: 15px; box-shadow: var(--box-shadow);">
+                        <h3 style="display: flex; align-items: center; margin-bottom: 1.2rem;">
+                            <span style="background: var(--primary-color); color: white; width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-right: 10px; font-size: 1.5rem;">🤖</span>
+                            코파일럿 설정
+                        </h3>
+                        <ol class="steps">
+                            <li>VS Code 좌측 확장 아이콘 클릭 <span style="font-size: 1.2rem;">🧩</span></li>
+                            <li>'GitHub Copilot' 검색 및 설치</li>
+                            <li>'GitHub Copilot Chat' 확장 설치</li>
+                            <li>GitHub 계정 연결 (우측 하단 계정 아이콘)</li>
+                            <li>에이전트 모드로 전환 (Ctrl+Shift+I)</li>
+                        </ol>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 1.5rem;">
+                    <div style="display: inline-block; background: #e3f2fd; padding: 0.8rem 1.5rem; border-radius: 30px; box-shadow: var(--box-shadow);">
+                        <p style="margin: 0; font-size: 1.1rem;"><span style="font-size: 1.5rem;">💡</span> <strong>VS Code는 가벼우면서도 다양한 기능을 갖춘 최고의 코드 에디터입니다!</strong></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- 슬라이드 9: 프로젝트 개요 -->
+        <section class="slide" id="slide-9">
+            <div class="slide-content">
+                <h2>🎮 오늘의 프로젝트: 로또 번호 추첨기</h2>
+                
+                <div style="position: relative; text-align: center; margin-bottom: 2rem;">
+                    <img src="images/lotto_screen.webp" alt="로또 번호 추첨기 실행 화면" class="large-image" style="border-radius: 15px; border: 3px solid var(--primary-color); box-shadow: var(--box-shadow);">
+                    <div style="position: absolute; top: -15px; right: -15px; background: var(--accent-color); color: white; border-radius: 50%; width: 70px; height: 70px; display: flex; justify-content: center; align-items: center; font-size: 2rem; transform: rotate(15deg); box-shadow: 0 3px 10px rgba(0,0,0,0.2);">🎯</div>
+                </div>
+                
+                <div class="two-columns" style="gap: 2.5rem;">
+                    <div class="column" style="background: linear-gradient(135deg, #f5f7ff, #f0f0f5); padding: 1.5rem; border-radius: 15px; box-shadow: var(--box-shadow);">
+                        <h3 style="display: flex; align-items: center; margin-bottom: 1.2rem;">
+                            <span style="background: var(--primary-color); color: white; width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-right: 10px; font-size: 1.5rem;">✨</span>
+                            주요 기능
+                        </h3>
+                        <ul class="icon-list">
+                            <li><i>🎲</i> 로또 번호 자동 추첨 (1~45)</li>
+                            <li><i>🔄</i> 단일/5조합 모드 선택</li>
+                            <li><i>🔮</i> 물리 엔진 기반 공 움직임</li>
+                            <li><i>🎨</i> 번호별 색상 구분</li>
+                            <li><i>💾</i> 로컬 스토리지에 번호 저장</li>
+                        </ul>
+                    </div>
+                    <div class="column" style="background: linear-gradient(135deg, rgba(106, 90, 205, 0.1), rgba(106, 90, 205, 0.2)); padding: 1.5rem; border-radius: 15px; box-shadow: var(--box-shadow);">
+                        <h3 style="display: flex; align-items: center; margin-bottom: 1.2rem;">
+                            <span style="background: var(--primary-color); color: white; width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-right: 10px; font-size: 1.5rem;">⚙️</span>
+                            기술 스택
+                        </h3>
+                        <ul class="icon-list">
+                            <li><i>🏗️</i> HTML: 웹페이지 구조</li>
+                            <li><i>🎨</i> CSS: 디자인 및 애니메이션</li>
+                            <li><i>⚙️</i> JavaScript: 기능 구현</li>
+                            <li><i></i> 반응형 디자인: 모바일 최적화</li>
+                            <li><i>💾</i> LocalStorage: 번호 저장</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 1.5rem; text-align: center;">
+                    <div style="display: inline-block; background: var(--gradient-bg); color: white; padding: 0.8rem 1.5rem; border-radius: 30px; box-shadow: var(--box-shadow);">
+                        <p style="margin: 0; font-size: 1.2rem;"><i>🔥</i> <strong>AI가 모든 코드를 자동으로 생성!</strong> <i>🔥</i></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+<!-- 슬라이드 10: 코파일럿 에이전트 사용하기 -->
+        <section class="slide" id="slide-10">
+            <div class="slide-content">
+                <h2>🤖 코파일럿 에이전트 사용하기</h2>
+                
+                <div style="position: relative; text-align: center; margin-bottom: 2rem;">
+                    <img src="images/copilot_interface.png" alt="코파일럿 에이전트 인터페이스" class="centered-image" style="border-radius: 15px; border: 3px solid var(--primary-color); box-shadow: var(--box-shadow);">
+                    <div style="position: absolute; top: 40%; left: 30%; transform: translate(-50%, -50%) rotate(-10deg); background: var(--accent-color); color: white; padding: 0.5rem 1rem; border-radius: 8px; font-weight: bold; box-shadow: 0 3px 10px rgba(0,0,0,0.2);">
+                        자연어로 코드 생성 요청
+                    </div>
+                    <div style="position: absolute; top: 60%; right: 25%; transform: translate(50%, -50%) rotate(10deg); background: #4caf50; color: white; padding: 0.5rem 1rem; border-radius: 8px; font-weight: bold; box-shadow: 0 3px 10px rgba(0,0,0,0.2);">
+                        AI가 코드를 작성
+                    </div>
+                </div>
+                
+                <div class="two-columns" style="gap: 2.5rem;">
+                    <div class="column" style="background: linear-gradient(135deg, #f5f7ff, #f0f0f5); padding: 1.5rem; border-radius: 15px; box-shadow: var(--box-shadow);">
+                        <h3 style="display: flex; align-items: center; margin-bottom: 1.2rem;">
+                            <span style="background: var(--primary-color); color: white; width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-right: 10px; font-size: 1.5rem;">▶️</span>
+                            에이전트 실행 방법
+                        </h3>
+                        <ol class="steps">
+                            <li>VS Code 실행 및 새 폴더 생성</li>
+                            <li>하단 코파일럿 아이콘 클릭 또는 <code style="background: white; padding: 0.2rem 0.4rem; border-radius: 3px;">Ctrl+Shift+I</code> 단축키</li>
+                            <li>모드 드롭다운에서 'Agent' 선택</li>
+                            <li>프롬프트 입력 후 전송 (Enter)</li>
+                            <li>AI가 자동으로 파일 생성 및 코드 작성</li>
+                        </ol>
+                    </div>
+                    <div class="column" style="background: linear-gradient(135deg, rgba(106, 90, 205, 0.1), rgba(106, 90, 205, 0.2)); padding: 1.5rem; border-radius: 15px; box-shadow: var(--box-shadow);">
+                        <h3 style="display: flex; align-items: center; margin-bottom: 1.2rem;">
+                            <span style="background: var(--primary-color); color: white; width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-right: 10px; font-size: 1.5rem;">⚙️</span>
+                            에이전트 작동 방식
+                        </h3>
+                        <ul class="icon-list">
+                            <li><i>📝</i> 프롬프트 분석 및 계획 수립</li>
+                            <li><i>📂</i> 필요한 파일 자동 생성 (HTML, CSS, JS)</li>
+                            <li><i>⚙️</i> 코드 작성 및 수정 (실시간)</li>
+                            <li><i>🔄</i> 필요시 터미널 명령 실행</li>
+                            <li><i>🔍</i> 오류 감지 및 수정 (자동 디버깅)</li>
+                            <li><i>💬</i> 코드 설명 및 추가 요청 대응</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 1.5rem;">
+                    <div style="display: inline-block; background: var(--gradient-bg); color: white; padding: 0.8rem 1.5rem; border-radius: 30px; box-shadow: var(--box-shadow);">
+                        <p style="margin: 0; font-size: 1.2rem;"><i>✨</i> <strong>코딩 지식 없이도 프롬프트만으로 완성된 웹사이트 제작!</strong></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- 슬라이드 11: 효과적인 프롬프트 작성법 -->
+        <section class="slide" id="slide-11">
+            <div class="slide-content">
+                <h2>✏️ 효과적인 프롬프트 작성법</h2>
+                
+                <div style="display: flex; flex-direction: column; gap: 2rem; margin-bottom: 2rem;">
+                    <div style="display: flex; background: linear-gradient(135deg, #fff5f5, #ffebee); padding: 1.5rem; border-radius: 15px; box-shadow: var(--box-shadow); position: relative; overflow: hidden;">
+                        <div style="position: absolute; top: 0; left: 0; width: 8px; height: 100%; background: #f44336;"></div>
+                        <div style="flex: 1; padding-left: 1rem;">
+                            <h3 style="color: #d32f2f; display: flex; align-items: center; margin-bottom: 1rem;">
+                                <span style="font-size: 2rem; margin-right: 0.5rem;">❌</span> 나쁜 프롬프트
+                            </h3>
+                            <div style="background: white; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border-left: 3px solid #f44336;">
+                                <p style="margin: 0; font-family: monospace; font-size: 1.1rem;">"로또 번호 생성기 웹사이트 만들어줘"</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; background: linear-gradient(135deg, #f1f8e9, #dcedc8); padding: 1.5rem; border-radius: 15px; box-shadow: var(--box-shadow); position: relative; overflow: hidden;">
+                        <div style="position: absolute; top: 0; left: 0; width: 8px; height: 100%; background: #4caf50;"></div>
+                        <div style="flex: 1; padding-left: 1rem;">
+                            <h3 style="color: #2e7d32; display: flex; align-items: center; margin-bottom: 1rem;">
+                                <span style="font-size: 2rem; margin-right: 0.5rem;">✅</span> 좋은 프롬프트
+                            </h3>
+                            <div style="background: white; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border-left: 3px solid #4caf50; max-height: 100px; overflow-y: auto;">
+                                <p style="margin: 0; font-family: monospace; font-size: 0.9rem;">"HTML, CSS, JavaScript로 구성된 로또 번호 추첨기 웹사이트를 만들어주세요. 다크모드 레이아웃에 원형 UI로 1~45번 공이 물리엔진 기반으로 움직이며, 단일 조합과 5개 조합 모드를 선택할 수 있게 해주세요. 번호별로 색상도 다르게 표시해주세요."</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="background: linear-gradient(135deg, rgba(106, 90, 205, 0.1), rgba(106, 90, 205, 0.2)); padding: 1.5rem; border-radius: 15px; box-shadow: var(--box-shadow);">
+                    <h3 style="text-align: center; margin-bottom: 1.2rem; color: var(--primary-color);">📝 프롬프트 작성 5가지 원칙</h3>
+                    <ul class="icon-list">
+                        <li><i></i> <strong>구체적으로 작성하기</strong>: 원하는 기능, 디자인, 레이아웃을 상세히 설명</li>
+                        <li><i>🔍</i> <strong>참고 사이트 제공하기</strong>: 비슷한 예시 사이트 URL 첨부</li>
+                        <li><i>📂</i> <strong>파일 구조 명시하기</strong>: HTML, CSS, JS 등 필요한 파일 목록</li>
+                        <li><i>✅</i> <strong>필수 구현 항목 나열하기</strong>: 꼭 포함되어야 할 기능들</li>
+                        <li><i>🎨</i> <strong>세부 스타일 지정하기</strong>: 색상, 폰트, 애니메이션 등</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 슬라이드 12: 로또 번호 추첨기 프롬프트 -->
+        <section class="slide" id="slide-12">
+            <div class="slide-content">
+                <h2>📋 로또 번호 추첨기 프롬프트 예시</h2>
+                
+                
+                <div style="background: #f8f9ff; padding: 1.5rem; border-radius: 15px; box-shadow: var(--box-shadow); max-height: 400px; overflow-y: auto; border-left: 5px solid var(--primary-color);">
+                    <h3 style="display: flex; align-items: center; margin-bottom: 1.2rem;">
+                        <span style="background: var(--primary-color); color: white; width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-right: 10px; font-size: 1.5rem;">📝</span>
+                        개조식 최종 프롬프트
+                    </h3>
+                    <button id="copy-button" style="background: var(--primary-color); color: white; padding: 0.8rem 1.5rem; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer; box-shadow: var(--box-shadow); transition: transform 0.3s, box-shadow 0.3s;">
+                        복사
+                    </button>
+
+                    <script>
+                        document.getElementById('copy-button').addEventListener('click', function() {
+                            const promptText = `
+                    HTML, CSS, JavaScript로 구성된 웹사이트를 만들어주세요.
+                    아래 사이트와 디자인, 레이아웃, UI 구성, 버튼 위치, 버튼 동작, 애니메이션, 공 움직임, 기능 처리 등을 전부 100% 동일하게 만들어주세요.
+                    참고 사이트: https://ramiteacher.github.io/lottoq/
+                    광고, 푸터, SEO 태그, meta 태그 등 불필요한 부분은 전부 제외해주세요.
+                    ---
+                    ## 파일 구성
+                    - index.html : 전체 화면 구성
+                    - styles.css : 스타일링 및 애니메이션 처리
+                    - script.js : 모든 기능 동작 처리, 이벤트 관리, 상태 관리
+                    ---
+                    ## 필수 구현 항목
+                    ### 디자인 / UI
+                    - 다크모드 레이아웃 (#121212)
+                    - 상단 로고 이미지 + 사이트명
+                    - 단일조합 / 5조합 모드 선택 라디오 버튼
+                    - 로또 머신 원형 UI (1~45번 공 배치)
+                    - 컨트롤 패널 : 추첨하기, 결과 바로보기, 속도변경, 사운드 토글 버튼
+                    - 결과영역 : 추첨된 공 표시 + 저장하기 버튼
+                    - 저장된 번호 모달
+                    - 당첨확인 모달 (동행복권 크롤링 방식)
+                    ---
+                    ## 공 움직임 및 애니메이션 처리
+                    - 추첨 시작시 머신 내부 공들이 자연스럽게 에어효과 및 물리엔진 기반으로 움직임
+                    - 공끼리 충돌 / 무작위 위치 이동 / 자연스러운 개별 공 움직임 처리
+                    - 로또 추첨기 스타일 팬 효과 적용
+                    - 뭉쳐서 좌우로만 움직이는 방식 금지
+                    - 원통 안에서 공기의 저항을 받는 느낌으로 공들이 자유롭게 분산 이동하며 회전, 충돌 처리
+                    ---
+                    ## 공 추첨 애니메이션
+                    - 공 추첨 후 해당 공은 바로 머신 하단 구멍으로 자연스럽게 떨어지는 애니메이션 처리
+                    - 공 크기 축소 / 투명도 하락 / 자연스러운 낙하 및 사라짐
+                    - 추첨된 공은 떨어지자마자 실시간으로 결과영역에 오름차순 정렬 후 바로 표시
+                    ---
+                    ## 번호별 볼 색상 지정
+                    - 1~10 : 노랑
+                    - 11~20 : 파랑
+                    - 21~30 : 빨강
+                    - 31~40 : 회색
+                    - 41~45 : 초록
+                    ---
+                    ## 5조합 모드 처리 (핵심 로직)
+                    - 각 조합의 번호는 중복 가능
+                    - 단, "조합 전체"가 이전 조합과 완전히 동일하면 안됨
+                    - 이전 조합들과 숫자 6개 전부 동일하면 다시 뽑기
+                    - Set 또는 JSON.stringify 비교 방식 사용
+                    - 각 조합은 조합별로 묶어서 가로정렬 처리
+                    - 각 조합 오른쪽 끝에는 '저장하기' 버튼 배치
+                    - 결과 하단에는 전체 조합 일괄 저장 버튼 배치
+                    ---
+                    ## 기타 처리
+                    - 결과 바로보기 버튼 → 애니메이션 스킵 후 즉시 결과 출력
+                    - 속도변경 버튼 → 1x → 4x → 8x 순환
+                    - 사운드 토글 버튼 → 효과음 on/off 처리
+                    - 저장된 번호 localStorage 저장 / 중복 저장 방지
+                    - 당첨확인 모달 → fetch + DOMParser 방식 동행복권 사이트 최신 당첨번호 크롤링 후 비교 처리
+                    cors 문제로 프록시 필수. 일치한 번호는 강조 3개 맞으면 5등 4개맞으면 4등 5개맞으면 3등 5개에 보너스번호1개 맞으면 2등 보너스번호 제외 모두 일치시 1등 이렇게 나오도록
+                    - 모바일 반응형 필수
+                    - HTML5 / ES6 표준 준수
+                    - 코드 주석 충분히 작성
+                    - 모듈화 금지 → 단일 파일 구성 유지
+                    - 기능 추가 금지 / UX 변경 금지 / 스타일 임의 변경 금지
+                    - 원본 사이트와 완전히 동일한 결과물이 나오도록 구현
+                    ---
+                    ## 목표
+                    처음 보는 개발자도 Copilot Agent에 이 프롬프트만 넣으면  
+                    https://ramiteacher.github.io/lottoq/ 사이트와 완전히 동일한 결과물이 자동 생성되도록 만들어주세요.
+                            `;
+                            navigator.clipboard.writeText(promptText).then(() => {
+                                alert('프롬프트가 복사되었습니다!');
+                            }).catch(err => {
+                                alert('복사에 실패했습니다. 다시 시도해주세요.');
+                            });
+                        });
+                    </script>
+                    <div style="margin-bottom: 1.5rem;">
+                        <h4 style="color: var(--primary-color); margin-bottom: 0.5rem; display: flex; align-items: center;">
+                            <span style="font-size: 1.5rem; margin-right: 0.5rem;">🔰</span> 전체 프롬프트
+                        </h4>
+                        <div style="background: white; padding: 1rem; border-radius: 8px; border-left: 3px solid var(--primary-color);">
+                            <p style="margin: 0; font-family: 'Noto Sans KR', sans-serif; font-size: 0.9rem; line-height: 1.6;"></p>
+                                HTML, CSS, JavaScript로 구성된 웹사이트를 만들어주세요.<br><br>
+
+                                아래 사이트와 디자인, 레이아웃, UI 구성, 버튼 위치, 버튼 동작, 애니메이션, 공 움직임, 기능 처리 등을 전부 100% 동일하게 만들어주세요.<br>
+                                참고 사이트: <a href="https://ramiteacher.github.io/lottoq/" target="_blank" style="color: var(--primary-color); text-decoration: underline;">https://ramiteacher.github.io/lottoq/</a><br><br>
+
+                                광고, 푸터, SEO 태그, meta 태그 등 불필요한 부분은 전부 제외해주세요.<br><br>
+
+                                <strong>파일 구성:</strong><br>
+                                - index.html : 전체 화면 구성<br>
+                                - styles.css : 스타일링 및 애니메이션 처리<br>
+                                - script.js : 모든 기능 동작 처리, 이벤트 관리, 상태 관리<br><br>
+
+                                <strong>필수 구현 항목:</strong><br>
+                                <strong>디자인 / UI</strong><br>
+                                - 다크모드 레이아웃 (#121212)<br>
+                                - 상단 로고 이미지 + 사이트명<br>
+                                - 단일조합 / 5조합 모드 선택 라디오 버튼<br>
+                                - 로또 머신 원형 UI (1~45번 공 배치)<br>
+                                - 컨트롤 패널 : 추첨하기, 결과 바로보기, 속도변경, 사운드 토글 버튼<br>
+                                - 결과영역 : 추첨된 공 표시 + 저장하기 버튼<br>
+                                - 저장된 번호 모달<br>
+                                - 당첨확인 모달 (동행복권 크롤링 방식)<br><br>
+
+                                <strong>공 움직임 및 애니메이션 처리</strong><br>
+                                - 추첨 시작 시 머신 내부 공들이 자연스럽게 에어효과 및 물리엔진 기반으로 움직임<br>
+                                - 공끼리 충돌 / 무작위 위치 이동 / 자연스러운 개별 공 움직임 처리<br>
+                                - 로또 추첨기 스타일 팬 효과 적용<br>
+                                - 원통 안에서 공기의 저항을 받는 느낌으로 공들이 자유롭게 분산 이동하며 회전, 충돌 처리<br><br>
+
+                                <strong>공 추첨 애니메이션</strong><br>
+                                - 공 추첨 후 해당 공은 바로 머신 하단 구멍으로 자연스럽게 떨어지는 애니메이션 처리<br>
+                                - 공 크기 축소 / 투명도 하락 / 자연스러운 낙하 및 사라짐<br>
+                                - 추첨된 공은 떨어지자마자 실시간으로 결과영역에 오름차순 정렬 후 바로 표시<br><br>
+
+                                <strong>번호별 볼 색상 지정</strong><br>
+                                - 1~10 : 노랑<br>
+                                - 11~20 : 파랑<br>
+                                - 21~30 : 빨강<br>
+                                - 31~40 : 회색<br>
+                                - 41~45 : 초록<br><br>
+
+                                <strong>5조합 모드 처리 (핵심 로직)</strong><br>
+                                - 각 조합의 번호는 중복 가능<br>
+                                - 단, "조합 전체"가 이전 조합과 완전히 동일하면 안 됨<br>
+                                - 이전 조합들과 숫자 6개 전부 동일하면 다시 뽑기<br>
+                                - Set 또는 JSON.stringify 비교 방식 사용<br>
+                                - 각 조합은 조합별로 묶어서 가로정렬 처리<br>
+                                - 각 조합 오른쪽 끝에는 '저장하기' 버튼 배치<br>
+                                - 결과 하단에는 전체 조합 일괄 저장 버튼 배치<br><br>
+
+                                <strong>기타 처리</strong><br>
+                                - 결과 바로보기 버튼 → 애니메이션 스킵 후 즉시 결과 출력<br>
+                                - 속도변경 버튼 → 1x → 4x → 8x 순환<br>
+                                - 사운드 토글 버튼 → 효과음 on/off 처리<br>
+                                - 저장된 번호 localStorage 저장 / 중복 저장 방지<br>
+                                - 당첨확인 모달 → fetch + DOMParser 방식 동행복권 사이트 최신 당첨번호 크롤링 후 비교 처리<br>
+                                - cors 문제로 프록시 필수. 일치한 번호는 강조<br>
+                                - 모바일 반응형 필수<br>
+                                - HTML5 / ES6 표준 준수<br>
+                                - 코드 주석 충분히 작성<br>
+                                - 모듈화 금지 → 단일 파일 구성 유지<br>
+                                - 기능 추가 금지 / UX 변경 금지 / 스타일 임의 변경 금지<br>
+                                - 원본 사이트와 완전히 동일한 결과물이 나오도록 구현<br><br>
+
+                                <strong>목표:</strong><br>
+                                처음 보는 개발자도 Copilot Agent에 이 프롬프트만 넣으면<br>
+                                <a href="https://ramiteacher.github.io/lottoq/" target="_blank" style="color: var(--primary-color); text-decoration: underline;">https://ramiteacher.github.io/lottoq/</a> 사이트와 완전히 동일한 결과물이 자동 생성되도록 만들어주세요.
+                            </p>
+                                
+                        </div>
+                    </div>
+                    
+        </section>
+
+
+
+        
+
+        <!-- 슬라이드 13: 로또 번호 추첨기 결과물 -->
+        <section class="slide" id="slide-13">
+            <div class="slide-content">
+                <h2>🎉 로또 번호 추첨기 결과물</h2>
+                
+                <div style="display: flex; gap: 2rem; margin-bottom: 2rem;">
+                    <div style="flex: 3;">
+                        <div style="position: relative;">
+                            <img src="images/lotto_screen.webp" alt="로또 번호 추첨기 실행 화면" style="width: 100%; border-radius: 15px; border: 3px solid var(--primary-color); box-shadow: var(--box-shadow);">
+                            <div style="position: absolute; top: -15px; right: -15px; background: var(--accent-color); color: white; border-radius: 50%; width: 70px; height: 70px; display: flex; justify-content: center; align-items: center; font-size: 2rem; transform: rotate(15deg); box-shadow: 0 3px 10px rgba(0,0,0,0.2);">🚀</div>
+                        </div>
+                    </div>
+                    <div style="flex: 2; display: flex; flex-direction: column; gap: 1rem;">
+                        <div style="background: linear-gradient(135deg, #e3f2fd, #bbdefb); padding: 1rem; border-radius: 15px; box-shadow: var(--box-shadow); display: flex; align-items: center;">
+                            <div style="font-size: 2.5rem; margin-right: 1rem;">🎲</div>
+                            <div>
+                                <h4 style="margin: 0 0 0.3rem 0;">번호 추첨</h4>
+                                <p style="margin: 0; font-size: 0.9rem;">물리 엔진 기반 애니메이션</p>
+                            </div>
+                        </div>
+                        <div style="background: linear-gradient(135deg, #fff8e1, #ffecb3); padding: 1rem; border-radius: 15px; box-shadow: var(--box-shadow); display: flex; align-items: center;">
+                            <div style="font-size: 2.5rem; margin-right: 1rem;">🔄</div>
+                            <div>
+                                <h4 style="margin: 0 0 0.3rem 0;">여러 모드</h4>
+                                <p style="margin: 0; font-size: 0.9rem;">단일/5조합 모드 선택 가능</p>
+                            </div>
+                        </div>
+                        <div style="background: linear-gradient(135deg, #e8f5e9, #c8e6c9); padding: 1rem; border-radius: 15px; box-shadow: var(--box-shadow); display: flex; align-items: center;">
+                            <div style="font-size: 2.5rem; margin-right: 1rem;">💾</div>
+                            <div>
+                                <h4 style="margin: 0 0 0.3rem 0;">번호 저장</h4>
+                                <p style="margin: 0; font-size: 0.9rem;">로컬 스토리지에 결과 저장</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="two-columns" style="gap: 2.5rem;">
+                    <div class="column" style="background: linear-gradient(135deg, #f5f7ff, #f0f0f5); padding: 1.5rem; border-radius: 15px; box-shadow: var(--box-shadow);">
+                        <h3 style="display: flex; align-items: center; margin-bottom: 1.2rem;">
+                            <span style="background: var(--primary-color); color: white; width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-right: 10px; font-size: 1.5rem;">✅</span>
+                            구현된 기능
+                        </h3>
+                        <ul class="icon-list">
+                            <li><i>🎲</i> 로또 번호 자동 추첨</li>
+                            <li><i>🔄</i> 단일/5조합 모드</li>
+                            <li><i>🔮</i> 물리 엔진 기반 애니메이션</li>
+                            <li><i>🎨</i> 번호별 색상 구분</li>
+                            <li><i>💾</i> 번호 저장 기능</li>
+                            <li><i>📱</i> 모바일 최적화 디자인</li>
+                        </ul>
+                    </div>
+                    <div class="column" style="background: linear-gradient(135deg, rgba(106, 90, 205, 0.1), rgba(106, 90, 205, 0.2)); padding: 1.5rem; border-radius: 15px; box-shadow: var(--box-shadow);">
+                        <h3 style="display: flex; align-items: center; margin-bottom: 1.2rem;">
+                            <span style="background: var(--primary-color); color: white; width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-right: 10px; font-size: 1.5rem;">💬</span>
+                            코드 수정 방법
+                        </h3>
+                        <ul class="icon-list">
+                            <li><i>💬</i> 에이전트에게 수정 요청하기</li>
+                            <li><i>🔄</i> "로고 이미지를 변경해줘"</li>
+                            <li><i>🎨</i> "버튼 색상을 파란색으로 바꿔줘"</li>
+                            <li><i>➕</i> "번호 저장 기능을 추가해줘"</li>
+                            <li><i>❓</i> "이 코드가 어떻게 작동하는지 설명해줘"</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 슬라이드 14: GitHub Pages 배포하기 -->
+        <section class="slide" id="slide-14">
+            <div class="slide-content">
+                <h2>🚀 GitHub Pages로 웹사이트 배포하기</h2>
+                
+                <div style="text-align: center; margin-bottom: 1.5rem;">
+                    <div style="display: inline-block; background: linear-gradient(135deg, rgba(106, 90, 205, 0.1), rgba(255, 107, 107, 0.1)); padding: 1rem 2rem; border-radius: 50px; box-shadow: var(--box-shadow);">
+                        <p style="font-size: 1.4rem; margin: 0;"><strong>무료로 나만의 웹사이트 배포하기</strong></p>
+                    </div>
+                </div>
+                
+                <div style="position: relative; text-align: center; margin-bottom: 2rem;">
+                    <img src="images/github_pages.png" alt="GitHub Pages 설정" class="centered-image" style="border-radius: 15px; border: 3px solid var(--primary-color); box-shadow: var(--box-shadow);">
+                    <div style="position: absolute; top: -15px; right: -15px; background: #4caf50; color: white; border-radius: 50%; width: 70px; height: 70px; display: flex; justify-content: center; align-items: center; font-size: 2rem; transform: rotate(15deg); box-shadow: 0 3px 10px rgba(0,0,0,0.2);">🌐</div>
+                </div>
+                
+                <div class="two-columns" style="gap: 2.5rem;">
+                    <div class="column" style="background: linear-gradient(135deg, #f5f7ff, #f0f0f5); padding: 1.5rem; border-radius: 15px; box-shadow: var(--box-shadow);">
+                        <h3 style="display: flex; align-items: center; margin-bottom: 1.2rem;">
+                            <span style="background: var(--primary-color); color: white; width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-right: 10px; font-size: 1.5rem;">📂</span>
+                            GitHub 저장소 생성
+                        </h3>
+                        <ol class="steps">
+                            <li><a href="https://github.com/new" target="_blank" style="color: var(--primary-color); text-decoration: none; font-weight: bold;">github.com/new</a> 방문</li>
+                            <li>저장소 이름 입력 (예: lotto-generator)</li>
+                            <li>'Public' 선택 후 저장소 생성</li>
+                            <li>VS Code에서 생성한 파일들 업로드</li>
+                            <li>commit 및 push로 코드 저장</li>
+                        </ol>
+                    </div>
+                    <div class="column" style="background: linear-gradient(135deg, rgba(106, 90, 205, 0.1), rgba(106, 90, 205, 0.2)); padding: 1.5rem; border-radius: 15px; box-shadow: var(--box-shadow);">
+                        <h3 style="display: flex; align-items: center; margin-bottom: 1.2rem;">
+                            <span style="background: var(--primary-color); color: white; width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-right: 10px; font-size: 1.5rem;">🌐</span>
+                            GitHub Pages 활성화
+                        </h3>
+                        <ol class="steps">
+                            <li>저장소 Settings 탭 클릭</li>
+                            <li>좌측 메뉴에서 'Pages' 선택</li>
+                            <li>'Branch' 섹션에서 'main' 선택</li>
+                            <li>'/(root)' 폴더 선택 후 저장</li>
+                            <li>몇 분 후 배포 완료 확인</li>
+                        </ol>
+                        <div style="background: white; padding: 1rem; border-radius: 8px; margin-top: 1rem; border-left: 3px solid var(--primary-color); display: flex; align-items: center;">
+                            <div style="font-size: 1.8rem; margin-right: 0.8rem;">🌐</div>
+                            <p style="margin: 0; font-family: monospace; font-size: 0.9rem;">배포 URL: <strong>https://사용자이름.github.io/저장소이름/</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 슬라이드 15: NFC 키링에 웹사이트 연결하기 -->
+        <section class="slide" id="slide-15">
+            <div class="slide-content">
+                <h2>📱 NFC 키링에 웹사이트 연결하기</h2>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2vw; margin: 2vh 0;">
+                    <div>
+                        <div style="background: linear-gradient(135deg, rgba(67, 97, 238, 0.1), rgba(67, 97, 238, 0.3)); padding: 2vh 2vw; border-radius: 15px; box-shadow: var(--box-shadow); margin-bottom: 2vh;">
+                            <h3 style="color: var(--primary-color); font-size: 1.8vw; margin-bottom: 1vh;">준비물</h3>
+                            <ul style="list-style: none; padding: 0; margin: 0;">
+                                <li style="display: flex; align-items: center; margin-bottom: 1vh; font-size: 1.2vw;">
+                                    <div style="width: 2.5vw; height: 2.5vw; background: var(--primary-color); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; flex-shrink: 0; margin-right: 1vw;">✓</div>
+                                    <div>NFC 기능이 있는 스마트폰</div>
+                                </li>
+                                <li style="display: flex; align-items: center; margin-bottom: 1vh; font-size: 1.2vw;">
+                                    <div style="width: 2.5vw; height: 2.5vw; background: var(--primary-color); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; flex-shrink: 0; margin-right: 1vw;">✓</div>
+                                    <div>NFC 태그가 내장된 키링</div>
+                                </li>
+                                <li style="display: flex; align-items: center; margin-bottom: 1vh; font-size: 1.2vw;">
+                                    <div style="width: 2.5vw; height: 2.5vw; background: var(--primary-color); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; flex-shrink: 0; margin-right: 1vw;">✓</div>
+                                    <div>NFC 태그 쓰기 앱</div>
+                                </li>
+                                <li style="display: flex; align-items: center; font-size: 1.2vw;">
+                                    <div style="width: 2.5vw; height: 2.5vw; background: var(--primary-color); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; flex-shrink: 0; margin-right: 1vw;">✓</div>
+                                    <div>웹사이트 URL</div>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div style="background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(255, 107, 107, 0.3)); padding: 2vh 2vw; border-radius: 15px; box-shadow: var(--box-shadow);">
+                            <h3 style="color: var(--accent-color); font-size: 1.8vw; margin-bottom: 1vh;">주요 NFC 태그 앱</h3>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1vw;">
+                                <div style="background: white; padding: 1vh 1vw; border-radius: 10px; text-align: center; font-size: 1.2vw;">
+                                    <div style="font-size: 1.6vw; margin-bottom: 0.5vh;">📱</div>
+                                    <strong>안드로이드:</strong><br>NFC Tools
+                                </div>
+                                <div style="background: white; padding: 1vh 1vw; border-radius: 10px; text-align: center; font-size: 1.2vw;">
+                                    <div style="font-size: 1.6vw; margin-bottom: 0.5vh;">📱</div>
+                                    <strong>아이폰:</strong><br>NFC TagWriter
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div style="background: white; padding: 2vh 2vw; border-radius: 15px; box-shadow: var(--box-shadow); height: 100%;">
+                            <h3 style="color: var(--secondary-color); font-size: 1.8vw; margin-bottom: 1vh;">NFC 태그에 URL 쓰기</h3>
+                            
+                            <ol style="padding-left: 1.5vw; margin: 0;">
+                                <li style="margin-bottom: 1vh; font-size: 1.2vw;">NFC 태그 쓰기 앱 설치 및 실행</li>
+                                <li style="margin-bottom: 1vh; font-size: 1.2vw;">'새 기록' 또는 'URL' 옵션 선택</li>
+                                <li style="margin-bottom: 1vh; font-size: 1.2vw;">웹사이트 URL 입력 (예: https://username.github.io/my-website)</li>
+                                <li style="margin-bottom: 1vh; font-size: 1.2vw;">'쓰기' 버튼 클릭</li>
+                                <li style="margin-bottom: 1vh; font-size: 1.2vw;">스마트폰을 NFC 키링에 가까이 대기</li>
+                                <li style="font-size: 1.2vw;">쓰기 완료 확인</li>
+                            </ol>
+                            
+                            <div style="margin-top: 2vh; text-align: center;">
+                                <img src="images/nfc_keyring.webp" alt="NFC 키링" style="width: 45%; border-radius: 10px; display: inline-block;">
+                                <img src="images/smartphone_nfc.webp" alt="스마트폰 NFC 인식" style="width: 45%; border-radius: 10px; display: inline-block;">
+                            </div>
+                            
+                            <div style="margin-top: 2vh; background: #f8f9ff; padding: 1.5vh 1.5vw; border-radius: 10px; border-left: 4px solid var(--primary-color); font-size: 1.2vw;">
+                                <strong>팁:</strong> URL을 짧게 만들려면 URL 단축 서비스(예: Bitly)를 사용하면 좋습니다.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 슬라이드 16: 비즈니스 활용 아이디어 -->
+        <section class="slide" id="slide-16">
+            <div class="slide-content">
+                <h2>💼 온라인 셀러를 위한 비즈니스 활용 아이디어</h2>
+                
+                <div style="text-align: center; margin-bottom: 1vh;">
+                    <div style="display: inline-block; background: linear-gradient(135deg, rgba(106, 90, 205, 0.1), rgba(255, 107, 107, 0.1)); padding: 0.8vh 1.5vw; border-radius: 50px; box-shadow: var(--box-shadow);">
+                        <p style="font-size: 1.2vw; margin: 0;"><strong>AI와 NFC로 비즈니스 가치 창출하기</strong></p>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1vw; margin: 1.5vh 0;">
+                    <div style="background: white; padding: 1.5vh 1vw; border-radius: 15px; box-shadow: var(--box-shadow); text-align: center; border-top: 4px solid var(--primary-color);">
+                        <div style="font-size: 2.5vw; margin-bottom: 0.5vh;">🎲</div>
+                        <h3 style="margin: 0 0 0.5vh 0; color: var(--primary-color); font-size: 1.2vw;">로또 번호 추첨기 키링</h3>
+                        <p style="margin: 0; font-size: 0.9vw;">행운을 가져다 주는 NFC 키링</p>
+                    </div>
+                    
+                    <div style="background: white; padding: 1.5vh 1vw; border-radius: 15px; box-shadow: var(--box-shadow); text-align: center; border-top: 4px solid var(--accent-color);">
+                        <div style="font-size: 2.5vw; margin-bottom: 0.5vh;">🏷️</div>
+                        <h3 style="margin: 0 0 0.5vh 0; color: var(--accent-color); font-size: 1.2vw;">할인 쿠폰 키링</h3>
+                        <p style="margin: 0; font-size: 0.9vw;">온라인 스토어 할인 페이지 연결</p>
+                    </div>
+                    
+                    <div style="background: white; padding: 1.5vh 1vw; border-radius: 15px; box-shadow: var(--box-shadow); text-align: center; border-top: 4px solid #4caf50;">
+                        <div style="font-size: 2.5vw; margin-bottom: 0.5vh;">👤</div>
+                        <h3 style="margin: 0 0 0.5vh 0; color: #4caf50; font-size: 1.2vw;">디지털 명함 키링</h3>
+                        <p style="margin: 0; font-size: 0.9vw;">개인 프로필 및 포트폴리오 연결</p>
+                    </div>
+                    
+                    <div style="background: white; padding: 1.5vh 1vw; border-radius: 15px; box-shadow: var(--box-shadow); text-align: center; border-top: 4px solid #9c27b0;">
+                        <div style="font-size: 2.5vw; margin-bottom: 0.5vh;">📋</div>
+                        <h3 style="margin: 0 0 0.5vh 0; color: #9c27b0; font-size: 1.2vw;">배포 후 광고 삽입</h3>
+                        <p style="margin: 0; font-size: 0.9vw;">직접적인 수입으로 연결</p>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1vw; margin-top: 1vh;">
+                    <div style="background: white; padding: 1.5vh 1.5vw; border-radius: 15px; box-shadow: var(--box-shadow); border-left: 4px solid var(--primary-color);">
+                        <h3 style="margin: 0 0 0.5vh 0; font-size: 1.2vw; display: flex; align-items: center;">
+                            <span style="font-size: 1.5vw; margin-right: 0.5vw; color: var(--primary-color);">🌟</span>
+                            커스텀 제품 차별화
+                        </h3>
+                        <p style="margin: 0; font-size: 0.9vw;">일반 상품보다 높은 마진으로 판매 가능하며, 경쟁업체와의 차별점 제공</p>
+                    </div>
+                    
+                    <div style="background: white; padding: 1.5vh 1.5vw; border-radius: 15px; box-shadow: var(--box-shadow); border-left: 4px solid var(--accent-color);">
+                        <h3 style="margin: 0 0 0.5vh 0; font-size: 1.2vw; display: flex; align-items: center;">
+                            <span style="font-size: 1.5vw; margin-right: 0.5vw; color: var(--accent-color);">🔄</span>
+                            재방문율 증가
+                        </h3>
+                        <p style="margin: 0; font-size: 0.9vw;">동일한 NFC 태그에 새로운 콘텐츠를 업데이트하여 고객 재방문 유도</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 슬라이드 17: 추가 팁과 트릭 -->
+        <section class="slide" id="slide-17">
+            <div class="slide-content">
+                <h2>💡 추가 팁과 트릭</h2>
+                
+                <div style="text-align: center; margin-bottom: 1vh;">
+                    <div style="display: inline-block; background: linear-gradient(135deg, rgba(106, 90, 205, 0.1), rgba(255, 107, 107, 0.1)); padding: 0.8vh 1.5vw; border-radius: 50px; box-shadow: var(--box-shadow);">
+                        <p style="font-size: 1.2vw; margin: 0;"><strong>AI와 더 효과적으로 협업하기</strong></p>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1vw; margin-bottom: 1.5vh;">
+                    <div style="background: white; padding: 1.5vh 1vw; border-radius: 15px; box-shadow: var(--box-shadow); text-align: center; border-top: 4px solid var(--primary-color);">
+                        <div style="font-size: 2.5vw; margin-bottom: 0.5vh;">🖼️</div>
+                        <h4 style="margin: 0 0 0.5vh 0; font-size: 1.1vw; color: var(--primary-color);">참고 이미지 제공</h4>
+                        <p style="margin: 0; font-size: 0.9vw;">"이 디자인과 비슷하게 만들어줘"</p>
+                    </div>
+                    
+                    <div style="background: white; padding: 1.5vh 1vw; border-radius: 15px; box-shadow: var(--box-shadow); text-align: center; border-top: 4px solid var(--accent-color);">
+                        <div style="font-size: 2.5vw; margin-bottom: 0.5vh;">📝</div>
+                        <h4 style="margin: 0 0 0.5vh 0; font-size: 1.1vw; color: var(--accent-color);">단계적 요청</h4>
+                        <p style="margin: 0; font-size: 0.9vw;">복잡한 요청은 여러 단계로 나누기</p>
+                    </div>
+                    
+                    <div style="background: white; padding: 1.5vh 1vw; border-radius: 15px; box-shadow: var(--box-shadow); text-align: center; border-top: 4px solid #4caf50;">
+                        <div style="font-size: 2.5vw; margin-bottom: 0.5vh;">🔄</div>
+                        <h4 style="margin: 0 0 0.5vh 0; font-size: 1.1vw; color: #4caf50;">피드백 주기</h4>
+                        <p style="margin: 0; font-size: 0.9vw;">"이 부분을 더 크게 만들어줘"</p>
+                    </div>
+                    
+                    <div style="background: white; padding: 1.5vh 1vw; border-radius: 15px; box-shadow: var(--box-shadow); text-align: center; border-top: 4px solid #9c27b0;">
+                        <div style="font-size: 2.5vw; margin-bottom: 0.5vh;">❓</div>
+                        <h4 style="margin: 0 0 0.5vh 0; font-size: 1.1vw; color: #9c27b0;">코드 설명 요청</h4>
+                        <p style="margin: 0; font-size: 0.9vw;">"이 코드가 어떻게 작동하는지 설명해줘"</p>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 1vh;">
+                    <h3 style="display: flex; align-items: center; margin-bottom: 0.8vh; font-size: 1.3vw;">
+                        <span style="background: var(--primary-color); color: white; width: 2.5vw; height: 2.5vw; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-right: 0.8vw; font-size: 1.2vw;">🎨</span>
+                        웹사이트 커스터마이징
+                    </h3>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5vw;">
+                        <div style="background: linear-gradient(135deg, #f5f7ff, #f0f0f5); padding: 1.2vh 1.5vw; border-radius: 15px; box-shadow: var(--box-shadow);">
+                            <ul style="list-style: none; margin: 0; padding: 0;">
+                                <li style="margin-bottom: 0.5vh; font-size: 0.95vw;">
+                                    <span style="color: var(--primary-color); margin-right: 0.5vw;">🖼️</span>
+                                    <strong>로고 변경:</strong> "로고를 내 브랜드 이미지로 교체해줘"
+                                </li>
+                                <li style="margin-bottom: 0.5vh; font-size: 0.95vw;">
+                                    <span style="color: var(--primary-color); margin-right: 0.5vw;">🎨</span>
+                                    <strong>색상 테마:</strong> "primary-color를 #FF5733으로 변경해줘"
+                                </li>
+                            </ul>
+                        </div>
+                        <div style="background: linear-gradient(135deg, rgba(106, 90, 205, 0.1), rgba(106, 90, 205, 0.2)); padding: 1.2vh 1.5vw; border-radius: 15px; box-shadow: var(--box-shadow);">
+                            <ul style="list-style: none; margin: 0; padding: 0;">
+                                <li style="margin-bottom: 0.5vh; font-size: 0.95vw;">
+                                    <span style="color: var(--primary-color); margin-right: 0.5vw;">🔤</span>
+                                    <strong>폰트 변경:</strong> "글꼴을 'Noto Sans KR'로 바꿔줘"
+                                </li>
+                                <li style="margin-bottom: 0.5vh; font-size: 0.95vw;">
+                                    <span style="color: var(--primary-color); margin-right: 0.5vw;">📱</span>
+                                    <strong>기능 추가:</strong> "연락처 폼을 추가해줘"
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 슬라이드 18: 질문과 답변 -->
+        <section class="slide" id="slide-18">
+            <div class="slide-content">
+                <h2>❓ 자주 묻는 질문</h2>
+                
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1vw; margin: 1.5vh 0;">
+                    <div style="background: white; padding: 1.2vh 1.5vw; border-radius: 15px; box-shadow: var(--box-shadow); border-left: 4px solid var(--primary-color);">
+                        <h4 style="margin: 0 0 0.5vh 0; color: var(--primary-color); font-size: 1.1vw; display: flex; align-items: center;">
+                            <span style="flex-shrink: 0; font-size: 1.5vw; margin-right: 0.5vw;">❓</span>
+                            코딩 지식이 전혀 없어도 가능한가요?
+                        </h4>
+                        <p style="margin: 0; font-size: 0.9vw; display: flex; align-items: center;">
+                            <span style="flex-shrink: 0; font-size: 1vw; margin-right: 0.5vw; color: #4caf50;">✅</span>
+                            네, 프롬프트 작성만으로 웹사이트 제작이 가능합니다.
+                        </p>
+                    </div>
+                    
+                    <div style="background: white; padding: 1.2vh 1.5vw; border-radius: 15px; box-shadow: var(--box-shadow); border-left: 4px solid var(--accent-color);">
+                        <h4 style="margin: 0 0 0.5vh 0; color: var(--accent-color); font-size: 1.1vw; display: flex; align-items: center;">
+                            <span style="flex-shrink: 0; font-size: 1.5vw; margin-right: 0.5vw;">❓</span>
+                            다른 호스팅 방법은 없나요?
+                        </h4>
+                        <p style="margin: 0; font-size: 0.9vw; display: flex; align-items: center;">
+                            <span style="flex-shrink: 0; font-size: 1vw; margin-right: 0.5vw; color: #4caf50;">✅</span>
+                            Netlify, Vercel, Firebase 등 무료 호스팅 서비스를 이용할 수 있습니다.
+                        </p>
+                    </div>
+                    
+                    <div style="background: white; padding: 1.2vh 1.5vw; border-radius: 15px; box-shadow: var(--box-shadow); border-left: 4px solid #4caf50;">
+                        <h4 style="margin: 0 0 0.5vh 0; color: #4caf50; font-size: 1.1vw; display: flex; align-items: center;">
+                            <span style="flex-shrink: 0; font-size: 1.5vw; margin-right: 0.5vw;">❓</span>
+                            저작권 문제는 없나요?
+                        </h4>
+                        <p style="margin: 0; font-size: 0.9vw; display: flex; align-items: center;">
+                            <span style="flex-shrink: 0; font-size: 1vw; margin-right: 0.5vw; color: #4caf50;">✅</span>
+                            코파일럿으로 생성한 코드는 상업적으로 사용 가능합니다.
+                        </p>
+                    </div>
+                    
+                    <div style="background: white; padding: 1.2vh 1.5vw; border-radius: 15px; box-shadow: var(--box-shadow); border-left: 4px solid #9c27b0;">
+                        <h4 style="margin: 0 0 0.5vh 0; color: #9c27b0; font-size: 1.1vw; display: flex; align-items: center;">
+                            <span style="flex-shrink: 0; font-size: 1.5vw; margin-right: 0.5vw;">❓</span>
+                            웹사이트 수정은 어떻게 하나요?
+                        </h4>
+                        <p style="margin: 0; font-size: 0.9vw; display: flex; align-items: center;">
+                            <span style="flex-shrink: 0; font-size: 1vw; margin-right: 0.5vw; color: #4caf50;">✅</span>
+                            VS Code에서 파일을 수정한 후 GitHub에 다시 업로드하면 자동으로 반영됩니다. 코파일럿 에이전트에게 수정을 요청해도 됩니다.
+                        </p>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 1.5vh; display: flex; align-items: center; background: linear-gradient(135deg, rgba(106, 90, 205, 0.1), rgba(255, 107, 107, 0.1)); padding: 1.5vh 2vw; border-radius: 15px; box-shadow: var(--box-shadow);">
+                    <div style="font-size: 2.5vw; margin-right: 1.5vw; color: var(--primary-color);">💡</div>
+                    <div>
+                        <h3 style="margin: 0 0 0.5vh 0; font-size: 1.3vw;">추가 도움이 필요하신가요?</h3>
+                        <p style="margin: 0; font-size: 1vw;">코파일럿 에이전트는 코딩 관련 모든 질문에 답변할 수 있는 AI 비서입니다.<br>궁금한 점이 있으면 언제든지 물어보세요!</p>
+                    </div>
+                </div>
+                
+                <div style="background: white; margin-top: 1.5vh; padding: 1vh 2vw; border-radius: 15px; box-shadow: var(--box-shadow); text-align: center; border-top: 3px solid var(--accent-color);">
+                    <p style="margin: 0; font-size: 1.1vw; color: var(--accent-color);"><strong>전문가처럼 코딩하기 위해 알아야 할 것은 질문하는 방법뿐입니다!</strong></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 슬라이드 19: 마무리 -->
+        <section class="slide" id="slide-19">
+            <div class="slide-content">
+                <h2>🎉 마무리</h2>
+                
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <div style="display: inline-block; background: linear-gradient(135deg, rgba(106, 90, 205, 0.1), rgba(255, 107, 107, 0.1)); padding: 1rem 2rem; border-radius: 50px; box-shadow: var(--box-shadow);">
+                        <p style="font-size: 1.4rem; margin: 0;"><strong>코딩 없이 AI로 웹사이트 만들기</strong></p>
+                    </div>
+                </div>
+                
+                <div style="display: flex; justify-content: center; margin: 1.5rem 0 2.5rem;">
+                    <div style="display: flex; flex-wrap: wrap; gap: 1.5rem; max-width: 800px; justify-content: center;">
+                        <div style="position: relative;">
+                            <img src="images/copilot_interface.png" alt="VS Code 코파일럿 에이전트" style="max-height: 150px; border-radius: 10px; box-shadow: var(--box-shadow);">
+                            <div style="position: absolute; bottom: -10px; left: -10px; background: white; color: var(--primary-color); border-radius: 50%; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; box-shadow: var(--box-shadow); border: 2px solid var(--primary-color);">1</div>
+                        </div>
+                        <div style="position: relative;">
+                            <img src="images/lotto_screen.webp" alt="로또 번호 추첨기" style="max-height: 150px; border-radius: 10px; box-shadow: var(--box-shadow);">
+                            <div style="position: absolute; bottom: -10px; left: -10px; background: white; color: var(--primary-color); border-radius: 50%; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; box-shadow: var(--box-shadow); border: 2px solid var(--primary-color);">2</div>
+                        </div>
+                        <div style="position: relative;">
+                            <img src="images/github_pages.png" alt="GitHub Pages 설정" style="max-height: 150px; border-radius: 10px; box-shadow: var(--box-shadow);">
+                            <div style="position: absolute; bottom: -10px; left: -10px; background: white; color: var(--primary-color); border-radius: 50%; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; box-shadow: var(--box-shadow); border: 2px solid var(--primary-color);">3</div>
+                        </div>
+                        <div style="position: relative;">
+                            <img src="images/nfc_keyring.webp" alt="NFC 키링" style="max-height: 150px; border-radius: 10px; box-shadow: var(--box-shadow);">
+                            <div style="position: absolute; bottom: -10px; left: -10px; background: white; color: var(--primary-color); border-radius: 50%; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; box-shadow: var(--box-shadow); border: 2px solid var(--primary-color);">4</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="background: white; padding: 2rem; border-radius: 15px; box-shadow: var(--box-shadow); margin-bottom: 2rem;">
+                    <h3 style="text-align: center; margin-bottom: 1.5rem; color: var(--primary-color); display: flex; align-items: center; justify-content: center;">
+                        <span style="background: var(--primary-color); color: white; width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-right: 10px; font-size: 1.5rem;">📝</span>
+                        오늘 배운 내용
+                    </h3>
+                    <div style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center;">
+                        <div style="background: #f5f7ff; padding: 1rem; border-radius: 10px; width: calc(50% - 0.5rem); display: flex; align-items: center;">
+                            <div style="font-size: 2rem; margin-right: 1rem; color: var(--primary-color);">🤖</div>
+                            <p style="margin: 0;">VS Code 코파일럿 에이전트를 활용한 웹사이트 제작</p>
+                        </div>
+                        <div style="background: #f5f7ff; padding: 1rem; border-radius: 10px; width: calc(50% - 0.5rem); display: flex; align-items: center;">
+                            <div style="font-size: 2rem; margin-right: 1rem; color: var(--primary-color);">✍️</div>
+                            <p style="margin: 0;">효과적인 프롬프트 작성법</p>
+                        </div>
+                        <div style="background: #f5f7ff; padding: 1rem; border-radius: 10px; width: calc(50% - 0.5rem); display: flex; align-items: center;">
+                            <div style="font-size: 2rem; margin-right: 1rem; color: var(--primary-color);">🚀</div>
+                            <p style="margin: 0;">GitHub Pages를 통한 무료 웹사이트 배포</p>
+                        </div>
+                        <div style="background: #f5f7ff; padding: 1rem; border-radius: 10px; width: calc(50% - 0.5rem); display: flex; align-items: center;">
+                            <div style="font-size: 2rem; margin-right: 1rem; color: var(--primary-color);">📱</div>
+                            <p style="margin: 0;">NFC 키링에 웹사이트 연결하기</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); padding: 2rem; border-radius: 15px; box-shadow: var(--box-shadow); color: white;">
+                    <div style="font-size: 3.5rem; margin-bottom: 1rem;">✨</div>
+                    <p style="margin: 0; font-size: 1.5rem; font-weight: bold;">
+                        이제 여러분도 코딩 지식 없이 AI의 도움으로<br>나만의 웹사이트를 만들 수 있습니다!
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- 슬라이드 인디케이터 -->
+    <div class="slide-indicator">1 / 19</div>
+
+    <!-- 네비게이션 버튼 -->
+    <div class="nav-buttons">
+        <button class="nav-button" id="prev-button">←</button>
+        <button class="nav-button" id="next-button">→</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 슬라이드 관련 요소
+            const slides = document.querySelectorAll('.slide');
+            const totalSlides = slides.length;
+            let currentSlideIndex = 0;
+            
+            // 네비게이션 요소
+            const prevButton = document.getElementById('prev-button');
+            const nextButton = document.getElementById('next-button');
+            const slideIndicator = document.querySelector('.slide-indicator');
+            
+            // 초기 슬라이드 표시
+            showSlide(currentSlideIndex);
+            
+            // 슬라이드 표시 함수
+            function showSlide(index) {
+                // 범위를 벗어나면 처리
+                if (index < 0) index = 0;
+                if (index >= totalSlides) index = totalSlides - 1;
+                
+                // 모든 슬라이드 비활성화
+                slides.forEach(slide => slide.classList.remove('active'));
+                
+                // 현재 슬라이드 활성화
+                slides[index].classList.add('active');
+                
+                // 현재 인덱스 업데이트
+                currentSlideIndex = index;
+                
+                // 인디케이터 업데이트
+                slideIndicator.textContent = `${currentSlideIndex + 1} / ${totalSlides}`;
+                
+                // 슬라이드 내용이 넘치는 경우 처리
+                adjustCurrentSlideContent();
+            }
+            
+            // 슬라이드 내용 높이 조정 함수
+            function adjustCurrentSlideContent() {
+                const currentSlide = slides[currentSlideIndex];
+                const content = currentSlide.querySelector('.slide-content');
+                const contentHeight = content.scrollHeight;
+                const maxHeight = window.innerHeight * 0.94;
+                
+                if (contentHeight > maxHeight) {
+                    content.style.height = maxHeight + 'px';
+                    content.style.overflowY = 'auto';
+                } else {
+                    content.style.height = 'auto';
+                    content.style.overflowY = 'visible';
+                }
+            }
+            
+            // 이전 슬라이드로 이동
+            function goToPrevSlide() {
+                showSlide(currentSlideIndex - 1);
+            }
+            
+            // 다음 슬라이드로 이동
+            function goToNextSlide() {
+                showSlide(currentSlideIndex + 1);
+            }
+            
+            // 버튼 이벤트 리스너
+            prevButton.addEventListener('click', goToPrevSlide);
+            nextButton.addEventListener('click', goToNextSlide);
+            
+            // 키보드 이벤트 리스너 (좌우 화살표)
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'ArrowLeft') {
+                    goToPrevSlide();
+                    e.preventDefault();
+                } else if (e.key === 'ArrowRight') {
+                    goToNextSlide();
+                    e.preventDefault();
+                }
+            });
+            
+            // 창 크기 변경 이벤트 리스너
+            window.addEventListener('resize', adjustCurrentSlideContent);
+        });
+    </script>
+</body>
+</html>
