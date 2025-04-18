@@ -855,14 +855,17 @@
                 <span style="background: var(--primary-color); color: white; width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-right: 10px; font-size: 1.5rem;">📝</span>
                 개조식 최종 프롬프트
                 </h3>
-                <button id="copy-button" style="background: var(--primary-color); color: white; padding: 0.8rem 1.5rem; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer; box-shadow: var(--box-shadow); transition: transform 0.3s, box-shadow 0.3s;">
-                복사
-                </button>
+<button id="copy-button">복사</button>
 
-                <script>
-                document.getElementById('copy-button').addEventListener('click', function() {
-                    const promptText = `HTML, CSS, JavaScript 로 구성된 웹사이트를 만들어주세요.
+    <script>
+        document.getElementById('copy-button').addEventListener('click', function() {
+            const promptText = `HTML, CSS, JavaScript 로 구성된 웹사이트를 만들어주세요.
 
+## 참고 사이트 
+https://vermillion-crostata-64863b.netlify.app/
+https://ramiteacher.github.io/lottoq/
+
+똑같이 만들어라
 ---
 
 ## 파일 구성
@@ -876,7 +879,7 @@
 
 ### 디자인 / UI
 - 다크모드 레이아웃 (#121212)
-- 상단 로고 이미지 + 사이트명
+- 상단 사이트명
 - 단일조합 / 5조합 모드 선택 라디오 버튼
 - 로또 머신 원형 UI (1~45번 공 배치)
 - 컨트롤 패널 : 추첨하기, 결과 바로보기, 속도변경, 사운드 토글 버튼
@@ -930,44 +933,183 @@
 - 사운드 토글 버튼 → 효과음 on/off 처리
 - 저장된 번호 localStorage 저장 / 중복 저장 방지 - 저장된 번호도 볼색상 적용할것.
 - 당첨확인 모달 → fetch + DOMParser 방식 동행복권 사이트 최신회차 당첨번호 크롤링 후 비교 처리
-- cors 문제로 프록시 필수. 일치한 번호는 강조 3개 맞으면 5등 4개맞으면 4등 5개맞으면 3등 5개에 보너스번호1개 맞으면 2등 보너스번호 제외 모두 일치시 1등 이렇게 나오도록
-- 모바일 반응형 필수
+cors 문제로 프록시 필수. 일치한 번호는 강조 3개 맞으면 5등 4개맞으면 4등 5개맞으면 3등 5개에 보너스번호1개 맞으면 2등 보너스번호 제외 모두 일치시 1등 이렇게 나오도록
 - 저장된 번호 누르면 목록 꼭 뜨도록 할것
 - 당첨확인 누르면 저장된번호 목록 로드하여 당첨번호와 비교할것
 
----
+---예상가능한 오류들 모두 뜨지않도록 처리 할것
+        index.html:139 Live reload enabled.
+oQdQXTa.png:1 
+           Failed to load resource: the server responded with a status of 403 ()
+favicon.ico:1 
+           Failed to load resource: the server responded with a status of 404 (Not Found)
+script.js:673 Uncaught TypeError: numbers.forEach is not a function
+    at script.js:673:17
+    at Array.forEach (<anonymous>)
+    at HTMLButtonElement.showSavedNumbers (script.js:664:18)
+(익명) @ script.js:673
+showSavedNumbers @ script.js:664
+script.js:315 Uncaught (in promise) NotSupportedError: The element has no supported sources.
+drawBall @ script.js:315
+(익명) @ script.js:424
+setInterval
+startDrawing @ script.js:423
+favicon.ico:1 
+           GET http://127.0.0.1:5500/favicon.ico 404 (Not Found)
+script.js:673 Uncaught TypeError: numbers.forEach is not a function
+    at script.js:673:17
+    at Array.forEach (<anonymous>)
+    at HTMLButtonElement.showSavedNumbers (script.js:664:18)
+(익명) @ script.js:673
+showSavedNumbers @ script.js:664
+script.js:584 Uncaught TypeError: saved is not iterable
+    at script.js:584:28
+    at Array.some (<anonymous>)
+    at saveCombination (script.js:583:38)
+    at saveBtn.onclick (script.js:382:29)
+(익명) @ script.js:584
+saveCombination @ script.js:583
+saveBtn.onclick @ script.js:382
+script.js:673 Uncaught TypeError: numbers.forEach is not a function
+    at script.js:673:17
+    at Array.forEach (<anonymous>)
+    at HTMLButtonElement.showSavedNumbers (script.js:664:18)
+(익명) @ script.js:673
+showSavedNumbers @ script.js:664
+ 
+당첨번호 파싱 로직 -
+   // CORS 정보 추가
+   const corsInfo = document.createElement('div');
+   corsInfo.className = 'cors-info';
+   corsInfo.innerHTML = `<small style="display:block;margin:8px 0;padding:8px;background:#f8f9fa;border:1px solid #ddd;border-radius:4px;color:#666;">
+       * CORS 오류 발생 시 여러 프록시 서버를 자동으로 시도합니다.<br>
+       * 외부 사이트에서 사용 시 <a href="https://cors-anywhere.herokuapp.com/corsdemo" target="_blank" style="color:blue;text-decoration:underline">여기를 클릭하여 CORS 프록시 사용 권한을 활성화</a>하면 조회 확률이 높아집니다.
+   </small>`;
+   
+   // 최신 당첨번호 가져오기 버튼
+   const fetchLatestBtn = document.createElement('button');
+   fetchLatestBtn.id = 'fetchLatestBtn';
+   fetchLatestBtn.className = 'fetch-latest-btn';
+   fetchLatestBtn.textContent = '최신 당첨번호 가져오기';
+   
+   // 특정 회차 검색 입력창과 버튼
+   const roundInputContainer = document.createElement('div');
+   roundInputContainer.style.display = 'flex';
+   
+   const roundInput = document.createElement('input');
+   roundInput.type = 'number';
+   roundInput.id = 'roundInput';
+   roundInput.min = '1';
+   roundInput.placeholder = '회차 입력';
+   roundInput.style.width = '100px';
+   roundInput.style.marginRight = '5px';
+   roundInput.style.padding = '0 10px';
+   
+   const fetchRoundBtn = document.createElement('button');
+   fetchRoundBtn.id = 'fetchRoundBtn';
+   fetchRoundBtn.className = 'fetch-latest-btn';
+   fetchRoundBtn.style.backgroundColor = '#3F51B5';
+   fetchRoundBtn.textContent = '회차 조회';
+   
+   roundInputContainer.appendChild(roundInput);
+   roundInputContainer.appendChild(fetchRoundBtn);
+   
+   // 버튼 추가
+   buttonContainer.appendChild(fetchLatestBtn);
+   buttonContainer.appendChild(roundInputContainer);
+   buttonContainer.appendChild(corsInfo);
+   
+   // 버튼 컨테이너를 저장 버튼 앞에 삽입
+   const saveWinningBtn = document.getElementById('saveWinningBtn');
+   if (saveWinningBtn && saveWinningBtn.parentNode) {
+       saveWinningBtn.parentNode.insertBefore(buttonContainer, saveWinningBtn);
+   }
+}
+    
+    // 최신 당첨번호 가져오기 버튼 이벤트
+    document.getElementById('fetchLatestBtn').addEventListener('click', async () => {
+        const fetchBtn = document.getElementById('fetchLatestBtn');
+        fetchBtn.disabled = true;
+        fetchBtn.textContent = '가져오는 중...';
+        
+        const result = await fetchLatestWinningNumbers();
+        
+        fetchBtn.disabled = false;
+        fetchBtn.textContent = '최신 당첨번호 가져오기';
+        
+        if (result.success) {
+            alert(`${result.drawNo}회 당첨번호를 성공적으로 가져왔습니다!`);
+        }
+    });
+    
+    // 특정 회차 조회 버튼 이벤트
+    document.getElementById('fetchRoundBtn').addEventListener('click', async () => {
+        const roundInput = document.getElementById('roundInput');
+        const round = parseInt(roundInput.value);
+        
+        if (!round || round < 1) {
+            alert('유효한 회차 번호를 입력해주세요.');
+            return;
+        }
+        
+        const fetchBtn = document.getElementById('fetchRoundBtn');
+        fetchBtn.disabled = true;
+        fetchBtn.textContent = '조회 중...';
+        
+        const result = await fetchLottoNumberByRound(round);
+        
+        fetchBtn.disabled = false;
+        fetchBtn.textContent = '회차 조회';
+        
+        if (result.success) {
+            // 입력 필드에 번호 채우기
+            const inputs = document.querySelectorAll('.winning-number-input');
+            inputs.forEach((input, index) => {
+                input.value = result.numbers[index];
+            });
+            
+            // 보너스 번호 입력
+            document.getElementById('bonusNumberInput').value = result.bonus;
+            
+            // 당첨 날짜 형식 변환
+            const drawDate = new Date(result.date);
+            const formattedDate = drawDate.toLocaleDateString('ko-KR', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
+            
+            // 당첨번호 저장
+            saveWinningNumbers(result.numbers, result.bonus, `${result.round}회 (${formattedDate})`);
+            
+            // UI 업데이트
+            displayCurrentWinningNumbers();
+            
+            // 저장된 번호와 비교
+            checkSavedNumbersAgainstWinning();
+            
+            alert(`${result.round}회 당첨번호를 성공적으로 가져왔습니다!`);
+        } else {
+            alert(`당첨번호 가져오기 실패: ${result.error}`);
+        }
+    });
 
-## 예상 오류 처리
-- index.html:139 Live reload enabled.
-- oQdQXTa.png:1 Failed to load resource: the server responded with a status of 403 ()
-- favicon.ico:1 Failed to load resource: the server responded with a status of 404 (Not Found)
-- script.js:673 Uncaught TypeError: numbers.forEach is not a function
-- script.js:315 Uncaught (in promise) NotSupportedError: The element has no supported sources.
+참고하라
 
----
 
-## 당첨번호 파싱 로직
-const corsInfo = document.createElement('div');
-corsInfo.className = 'cors-info';
-corsInfo.innerHTML = `<small style="display:block;margin:8px 0;padding:8px;background:#f8f9fa;border:1px solid #ddd;border-radius:4px;color:#666;">
-    * CORS 오류 발생 시 여러 프록시 서버를 자동으로 시도합니다.<br>
-    * 외부 사이트에서 사용 시 <a href="https://cors-anywhere.herokuapp.com/corsdemo" target="_blank" style="color:blue;text-decoration:underline">여기를 클릭하여 CORS 프록시 사용 권한을 활성화</a>하면 조회 확률이 높아집니다.
-</small>`;
-
----
-
-## 추가 요구사항
+- 모바일 반응형 필수
 - HTML5 / ES6 표준 준수
 - 코드 주석 충분히 작성
 - 모듈화 금지 → 단일 파일 구성 유지
 - 기능 추가 금지 / UX 변경 금지 / 스타일 임의 변경 금지`;
-                    navigator.clipboard.writeText(promptText).then(() => {
-                    alert('프롬프트가 복사되었습니다!');
-                    }).catch(err => {
-                    alert('복사에 실패했습니다. 다시 시도해주세요.');
-                    });
-                });
-                </script>
+            
+            navigator.clipboard.writeText(promptText).then(() => {
+                alert('프롬프트가 복사되었습니다!');
+            }).catch(err => {
+                alert('복사에 실패했습니다. 다시 시도해주세요.');
+            });
+        });
+    </script>
                 <div style="margin-bottom: 1.5rem;">
                 <h4 style="color: var(--primary-color); margin-bottom: 0.5rem; display: flex; align-items: center;">
                     <span style="font-size: 1.5rem; margin-right: 0.5rem;">🔰</span> 전체 프롬프트
