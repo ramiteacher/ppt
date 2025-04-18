@@ -863,7 +863,6 @@
                 document.getElementById('copy-button').addEventListener('click', function() {
                     const promptText = `HTML, CSS, JavaScript 로 구성된 웹사이트를 만들어주세요.
 
-
 ---
 
 ## 파일 구성
@@ -931,10 +930,12 @@
 - 사운드 토글 버튼 → 효과음 on/off 처리
 - 저장된 번호 localStorage 저장 / 중복 저장 방지 - 저장된 번호도 볼색상 적용할것.
 - 당첨확인 모달 → fetch + DOMParser 방식 동행복권 사이트 최신회차 당첨번호 크롤링 후 비교 처리
-cors 문제로 프록시 필수. 일치한 번호는 강조 3개 맞으면 5등 4개맞으면 4등 5개맞으면 3등 5개에 보너스번호1개 맞으면 2등 보너스번호 제외 모두 일치시 1등 이렇게 나오도록
+- cors 문제로 프록시 필수. 일치한 번호는 강조 3개 맞으면 5등 4개맞으면 4등 5개맞으면 3등 5개에 보너스번호1개 맞으면 2등 보너스번호 제외 모두 일치시 1등 이렇게 나오도록
 - 모바일 반응형 필수
 - 저장된 번호 누르면 목록 꼭 뜨도록 할것
 - 당첨확인 누르면 저장된번호 목록 로드하여 당첨번호와 비교할것
+
+---
 
 ## 예상 오류 처리
 - index.html:139 Live reload enabled.
@@ -944,21 +945,22 @@ cors 문제로 프록시 필수. 일치한 번호는 강조 3개 맞으면 5등 
 - script.js:315 Uncaught (in promise) NotSupportedError: The element has no supported sources.
 
 ---
+
 ## 당첨번호 파싱 로직
-    CORS 정보 추가
-    const corsInfo = document.createElement('div');
-    corsInfo.className = 'cors-info';
-    corsInfo.innerHTML = `<small style="display:block;margin:8px 0;padding:8px;background:#f8f9fa;border:1px solid #ddd;border-radius:4px;color:#666;">
-        * CORS 오류 발생 시 여러 프록시 서버를 자동으로 시도합니다.<br>
-        * 외부 사이트에서 사용 시 <a href="https://cors-anywhere.herokuapp.com/corsdemo" target="_blank" style="color:blue;text-decoration:underline">여기를 클릭하여 CORS 프록시 사용 권한을 활성화</a>하면 조회 확률이 높아집니다.
-    </small>`;
+const corsInfo = document.createElement('div');
+corsInfo.className = 'cors-info';
+corsInfo.innerHTML = `<small style="display:block;margin:8px 0;padding:8px;background:#f8f9fa;border:1px solid #ddd;border-radius:4px;color:#666;">
+    * CORS 오류 발생 시 여러 프록시 서버를 자동으로 시도합니다.<br>
+    * 외부 사이트에서 사용 시 <a href="https://cors-anywhere.herokuapp.com/corsdemo" target="_blank" style="color:blue;text-decoration:underline">여기를 클릭하여 CORS 프록시 사용 권한을 활성화</a>하면 조회 확률이 높아집니다.
+</small>`;
+
+---
+
+## 추가 요구사항
 - HTML5 / ES6 표준 준수
 - 코드 주석 충분히 작성
 - 모듈화 금지 → 단일 파일 구성 유지
-- 기능 추가 금지 / UX 변경 금지 / 스타일 임의 변경 금지
-
----
-                    `;
+- 기능 추가 금지 / UX 변경 금지 / 스타일 임의 변경 금지`;
                     navigator.clipboard.writeText(promptText).then(() => {
                     alert('프롬프트가 복사되었습니다!');
                     }).catch(err => {
